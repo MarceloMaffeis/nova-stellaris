@@ -1,4 +1,4 @@
-﻿"""
+"""
 Nova Stellaris - Módulo Observatório do Cosmos
 Atlas Celeste, Balança Planetária, Calculadora de Velocidade e Imagem Astronômica do Dia.
 """
@@ -218,7 +218,6 @@ def render_observatory(user: dict):
                 <div class='cosmic-card' style='border-left: 4px solid #9d4edd;'>
                     <h3 style='color: #9d4edd;'>💡 Fato Científico Curioso</h3>
                     <p style='color: #e2e8f0;'>{body_data['curiosity']}</p>
-                    
                     <h3 style='color: #06d6a0; margin-top: 20px;'>🎬 Conexão Sci-Fi & Filmes</h3>
                     <p style='color: #e2e8f0;'>{body_data['scifi_link']}</p>
                 </div>
