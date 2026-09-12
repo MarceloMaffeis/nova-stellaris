@@ -1,10 +1,11 @@
-﻿"""
+"""
 Nova Stellaris - Laboratório Integrado STEAM
 Física, Matemática, Química Cósmica e Computação / Algoritmos do Rover.
 """
 
 import streamlit as st
 import numpy as np
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from database import add_xp, unlock_badge
