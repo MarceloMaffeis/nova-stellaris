@@ -1,0 +1,168 @@
+﻿"""
+Nova Stellaris - Plataforma Interativa de Aprendizado Espacial STEAM
+Ponto de entrada principal da aplicação Streamlit.
+"""
+
+import streamlit as st
+import os
+
+# Configuração da página
+st.set_page_config(
+    page_title="Nova Stellaris — Universo STEAM",
+    page_icon="🚀",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Inicializar Banco de Dados
+from database import init_db, get_or_create_user, update_user_profile, get_user_badges, get_user_stats
+init_db()
+
+# Carregar CSS
+def load_css():
+    css_path = os.path.join(os.path.dirname(__file__), "assets", "styles.css")
+    if os.path.exists(css_path):
+        with open(css_path, "r", encoding="utf-8") as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+load_css()
+
+# Importar Módulos
+from assets.badges import BADGES, get_rank_for_xp
+from modules.observatory import render_observatory
+from modules.sci_fi_missions import render_sci_fi_missions
+from modules.steam_lab import render_steam_lab
+from modules.cosmo_ai import render_cosmo_ai
+from modules.quiz_game import render_quiz_game
+from modules.knowledge_hub import render_knowledge_hub
+
+# ----------------------------------------------------------------------
+# BARRA LATERAL (SIDEBAR): PERFIL DO CADETE & NAVEGAÇÃO
+# ----------------------------------------------------------------------
+with st.sidebar:
+    st.markdown("""
+        <div style='text-align: center; margin-bottom: 15px;'>
+            <h1 style='color: #00d4ff; font-size: 1.8rem; margin: 0;'>NOVA STELLARIS</h1>
+            <p style='color: #94a3b8; font-size: 0.85rem;'>Estação Científica STEAM</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Gerenciamento de Perfil
+    if "current_username" not in st.session_state:
+        st.session_state.current_username = "Cadete Estelar"
+    if "current_avatar" not in st.session_state:
+        st.session_state.current_avatar = "👩‍🚀"
+        
+    user = get_or_create_user(st.session_state.current_username, st.session_state.current_avatar)
+    
+    with st.expander("👤 Alterar Perfil do Aluno", expanded=False):
+        new_name = st.text_input("Seu Nome de Explorador:", value=user["name"])
+        avatar_options = ["👩‍🚀", "👨‍🚀", "🚀", "🤖", "👾", "🌟", "🪐"]
+        new_avatar = st.selectbox("Escolha seu Avatar:", avatar_options, index=avatar_options.index(user["avatar"]) if user["avatar"] in avatar_options else 0)
+        
+        if st.button("Salvar Perfil"):
+            if new_name.strip():
+                update_user_profile(user["id"], new_name.strip(), new_avatar)
+                st.session_state.current_username = new_name.strip()
+                st.session_state.current_avatar = new_avatar
+                st.rerun()
+                
+    # Cartão de Nível & XP
+    rank_info = get_rank_for_xp(user["xp"])
+    current_rank = rank_info["current"]
+    next_rank = rank_info["next"]
+    progress_pct = rank_info["progress_pct"]
+    
+    st.markdown(f"""
+        <div class='xp-container'>
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                <span style='font-size: 2.2rem;'>{user['avatar']}</span>
+                <div>
+                    <h3 style='margin: 0; color: #f1f5f9; font-size: 1.1rem;'>{user['name']}</h3>
+                    <p style='margin: 0; color: {current_rank['badge_color']}; font-weight: 700; font-size: 0.85rem;'>
+                        {current_rank['icon']} {current_rank['title']}
+                    </p>
+                </div>
+            </div>
+            <div style='margin-top: 12px; display: flex; justify-content: space-between; font-size: 0.8rem; color: #94a3b8;'>
+                <span>XP: <strong>{user['xp']}</strong></span>
+                <span>{f"Próximo: {next_rank['min_xp']} XP" if next_rank else "Nível Máximo! 👑"}</span>
+            </div>
+            <div class='xp-bar-bg'>
+                <div class='xp-bar-fill' style='width: {progress_pct}%;'></div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Menu de Navegação
+    st.markdown("### 🧭 Painel de Controle")
+    nav_option = st.radio(
+        "Selecione o Módulo:",
+        [
+            "🌌 Observatório do Cosmos",
+            "🚀 Missões Sci-Fi Interativas",
+            "🧮 Laboratório Integrado STEAM",
+            "🤖 CosmoAI (Mentor Espacial)",
+            "🎮 AstroQuiz & Desafios",
+            "📚 Hub de Conhecimento",
+            "🏆 Minhas Insígnias & Conquistas"
+        ],
+        label_visibility="collapsed"
+    )
+    
+    st.markdown("---")
+    st.markdown("""
+        <div style='text-align: center; color: #64748b; font-size: 0.8rem;'>
+            <p>⭐ Desenvolvido para jovens cientistas curiosos</p>
+            <p><a href='https://github.com/MarceloMaffeis/nova-stellaris' target='_blank' style='color: #00d4ff; text-decoration: none;'>GitHub: MarceloMaffeis/nova-stellaris</a></p>
+        </div>
+    """, unsafe_allow_html=True)
+
+# ----------------------------------------------------------------------
+# ÁREA PRINCIPAL: ROTEAMENTO DE MÓDULOS
+# ----------------------------------------------------------------------
+# Atualizar dados do usuário a cada render
+user = get_or_create_user(st.session_state.current_username, st.session_state.current_avatar)
+
+if nav_option == "🌌 Observatório do Cosmos":
+    render_observatory(user)
+elif nav_option == "🚀 Missões Sci-Fi Interativas":
+    render_sci_fi_missions(user)
+elif nav_option == "🧮 Laboratório Integrado STEAM":
+    render_steam_lab(user)
+elif nav_option == "🤖 CosmoAI (Mentor Espacial)":
+    render_cosmo_ai(user)
+elif nav_option == "🎮 AstroQuiz & Desafios":
+    render_quiz_game(user)
+elif nav_option == "📚 Hub de Conhecimento":
+    render_knowledge_hub(user)
+elif nav_option == "🏆 Minhas Insígnias & Conquistas":
+    st.markdown("""
+        <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(30,16,60,0.95), rgba(16,20,47,0.95)); border: 1px solid #ffd166;'>
+            <h1 style='color: #ffd166; margin-bottom: 5px;'>🏆 Galeria de Insígnias Cósmicas</h1>
+            <p style='color: #cbd5e1; font-size: 1.1rem; margin: 0;'>
+                Colecione todas as medalhas completando missões, experimentos no laboratório e acertando desafios no quiz!
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    unlocked_badge_ids = set(get_user_badges(user["id"]))
+    
+    col_b1, col_b2, col_b3 = st.columns(3)
+    
+    for i, (badge_id, badge) in enumerate(BADGES.items()):
+        is_unlocked = badge_id in unlocked_badge_ids
+        target_col = [col_b1, col_b2, col_b3][i % 3]
+        
+        with target_col:
+            st.markdown(f"""
+                <div class='badge-item {'unlocked' if is_unlocked else 'locked'}' style='margin-bottom: 15px;'>
+                    <span style='font-size: 2.5rem;'>{badge['icon']}</span>
+                    <h4 style='color: {badge['color'] if is_unlocked else '#94a3b8'}; margin: 5px 0;'>{badge['title']}</h4>
+                    <span class='steam-tag' style='background: rgba(255,255,255,0.08); font-size: 0.75rem;'>{badge['category']}</span>
+                    <p style='color: #cbd5e1; font-size: 0.85rem; margin-top: 8px;'>{badge['description']}</p>
+                    <p style='color: #ffd166; font-size: 0.8rem; font-weight: 700; margin: 0;'>
+                        {'✅ Desbloqueada (+ ' + str(badge['xp_reward']) + ' XP)' if is_unlocked else '🔒 Bloqueada (+ ' + str(badge['xp_reward']) + ' XP)'}
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
