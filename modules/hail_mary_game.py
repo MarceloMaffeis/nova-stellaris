@@ -68,14 +68,18 @@ def render_hail_mary_game(user: dict):
             #canvas-wrapper {
                 position: relative;
                 width: 640px;
-                height: 420px;
+                height: 380px;
                 border: 2px solid #ffd166;
                 border-radius: 12px;
                 box-shadow: 0 0 25px rgba(255, 209, 102, 0.25);
                 background: #030712;
                 overflow: hidden;
             }
-            canvas { display: block; }
+            canvas {
+                display: block;
+                outline: none;
+                cursor: pointer;
+            }
             .screen-overlay {
                 position: absolute;
                 top: 0; left: 0; width: 100%; height: 100%;
@@ -101,49 +105,103 @@ def render_hail_mary_game(user: dict):
                 margin-top: 20px;
             }
             .btn-start:hover { transform: scale(1.05); }
-            #touch-bar {
+
+            /* PAINEL DE CONTROLES LUMINOSOS */
+            #controls-panel {
                 display: flex;
                 justify-content: space-between;
+                align-items: center;
                 width: 640px;
+                background: rgba(15, 23, 42, 0.9);
+                border: 1px solid rgba(255, 209, 102, 0.3);
+                border-radius: 12px;
                 margin-top: 8px;
+                padding: 10px 18px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             }
-            .dpad {
+            .dpad-container {
                 display: grid;
-                grid-template-columns: repeat(3, 40px);
-                grid-template-rows: repeat(3, 40px);
-                gap: 4px;
+                grid-template-columns: repeat(3, 52px);
+                grid-template-rows: repeat(3, 48px);
+                gap: 5px;
             }
-            .t-btn {
-                background: #1e293b;
-                border: 1px solid #475569;
+            .btn-ctrl {
+                background: linear-gradient(180deg, #1e293b, #0f172a);
+                border: 2px solid #ffd166;
                 color: #ffd166;
-                border-radius: 6px;
-                font-size: 16px;
-                font-weight: bold;
+                border-radius: 10px;
+                font-size: 17px;
+                font-weight: 800;
+                cursor: pointer;
                 display: flex;
+                flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                cursor: pointer;
+                box-shadow: 0 0 10px rgba(255, 209, 102, 0.25);
+                transition: all 0.1s ease;
+                touch-action: manipulation;
             }
-            .t-btn:active { background: #ffd166; color: #000; }
-            .t-action {
-                width: 110px;
-                height: 80px;
-                background: #d97706;
-                border: 2px solid #ffd166;
-                color: white;
-                font-weight: bold;
-                border-radius: 12px;
-                cursor: pointer;
-                box-shadow: 0 0 15px rgba(217, 119, 6, 0.4);
+            .btn-ctrl span.key-lbl {
+                font-size: 10px;
+                color: #94a3b8;
+                margin-top: -2px;
             }
-            .t-action:active { background: #ffd166; color: #000; }
+            .btn-ctrl:active, .btn-ctrl.active {
+                background: #ffd166;
+                color: #070913;
+                box-shadow: 0 0 18px rgba(255, 209, 102, 0.8);
+                transform: scale(0.93);
+            }
+            .btn-ctrl:active span.key-lbl { color: #070913; }
+            
+            .action-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+            }
+            .btn-action-big {
+                width: 140px;
+                height: 75px;
+                border-radius: 16px;
+                background: linear-gradient(135deg, #d97706, #f59e0b);
+                border: 3px solid #ffd166;
+                color: #ffffff;
+                font-size: 14px;
+                font-weight: 800;
+                cursor: pointer;
+                box-shadow: 0 0 20px rgba(245, 158, 11, 0.45);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.1s ease;
+                touch-action: manipulation;
+            }
+            .btn-action-big:active {
+                background: #ffd166;
+                color: #0f172a;
+                box-shadow: 0 0 30px rgba(255, 209, 102, 0.9);
+                transform: scale(0.95);
+            }
+            
+            .keys-guide {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                font-size: 11px;
+                color: #94a3b8;
+                background: rgba(0,0,0,0.3);
+                padding: 8px 12px;
+                border-radius: 8px;
+                border-left: 3px solid #ffd166;
+            }
         </style>
         </head>
         <body>
 
         <div id="canvas-wrapper">
-            <canvas id="gameCanvas" width="640" height="420"></canvas>
+            <canvas id="gameCanvas" width="640" height="380" tabindex="1"></canvas>
 
             <!-- TELA DE INÍCIO -->
             <div id="start-screen" class="screen-overlay">
@@ -183,30 +241,66 @@ def render_hail_mary_game(user: dict):
             </div>
         </div>
 
-        <div id="touch-bar">
-            <div class="dpad">
+        <!-- PAINEL DE CONTROLES LUMINOSOS E VISÍVEIS -->
+        <div id="controls-panel">
+            <div class="dpad-container">
                 <div></div>
-                <button class="t-btn" onpointerdown="keys.up=true" onpointerup="keys.up=false">▲</button>
+                <button class="btn-ctrl" id="btn-up" onpointerdown="startMove('up')" onpointerup="stopMove('up')" onpointerleave="stopMove('up')">
+                    ▲<span class="key-lbl">W</span>
+                </button>
                 <div></div>
-                <button class="t-btn" onpointerdown="keys.left=true" onpointerup="keys.left=false">◀</button>
-                <div style="background:rgba(255,255,255,0.05);border-radius:4px;"></div>
-                <button class="t-btn" onpointerdown="keys.right=true" onpointerup="keys.right=false">▶</button>
+                
+                <button class="btn-ctrl" id="btn-left" onpointerdown="startMove('left')" onpointerup="stopMove('left')" onpointerleave="stopMove('left')">
+                    ◀<span class="key-lbl">A</span>
+                </button>
+                <div style="background:rgba(255, 209, 102, 0.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#ffd166;font-weight:bold;">ROCKY</div>
+                <button class="btn-ctrl" id="btn-right" onpointerdown="startMove('right')" onpointerup="stopMove('right')" onpointerleave="stopMove('right')">
+                    ▶<span class="key-lbl">D</span>
+                </button>
+                
                 <div></div>
-                <button class="t-btn" onpointerdown="keys.down=true" onpointerup="keys.down=false">▼</button>
+                <button class="btn-ctrl" id="btn-down" onpointerdown="startMove('down')" onpointerup="stopMove('down')" onpointerleave="stopMove('down')">
+                    ▼<span class="key-lbl">S</span>
+                </button>
                 <div></div>
             </div>
-            <button class="t-action" onclick="triggerRockyShield()">ESCUDO<br>DE ROCKY<br>(Espaço)</button>
+
+            <div class="keys-guide">
+                <div>⌨️ <strong>W, A, S, D</strong> ou <strong>Setas</strong> = Mover Nave</div>
+                <div>🎶 <strong>Espaço</strong> = Escudo Harmônico de Rocky</div>
+                <div>💡 <em>Clique no jogo para focar o teclado</em></div>
+            </div>
+
+            <div class="action-container">
+                <button class="btn-action-big" onclick="triggerRockyShield()">
+                    🎶 ESCUDO
+                    <span style="font-size: 11px; font-weight: normal; color: #fef08a;">(Espaço)</span>
+                </button>
+            </div>
         </div>
 
         <script>
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
             
+            canvas.addEventListener('click', () => { canvas.focus(); });
+            
             let gameState = 'START'; // START, PLAYING, WIN, GAMEOVER
             const keys = { up: false, down: false, left: false, right: false };
             
-            let ship = { x: 100, y: 210, speed: 4.5, shields: 100 };
-            let rocky = { x: 60, y: 240, pulse: 0, shieldActive: 0 };
+            function startMove(dir) {
+                keys[dir] = true;
+                const btn = document.getElementById('btn-' + dir);
+                if (btn) btn.classList.add('active');
+            }
+            function stopMove(dir) {
+                keys[dir] = false;
+                const btn = document.getElementById('btn-' + dir);
+                if (btn) btn.classList.remove('active');
+            }
+            
+            let ship = { x: 100, y: 190, speed: 4.5, shields: 100 };
+            let rocky = { x: 60, y: 220, pulse: 0, shieldActive: 0 };
             let taumoebas = [];
             let astrophages = [];
             let stars = [];
@@ -214,22 +308,22 @@ def render_hail_mary_game(user: dict):
             let score = 0;
             
             for (let i = 0; i < 60; i++) {
-                stars.push({ x: Math.random() * 640, y: Math.random() * 420, speed: 0.5 + Math.random() * 2, size: Math.random() * 2 });
+                stars.push({ x: Math.random() * 640, y: Math.random() * 380, speed: 0.5 + Math.random() * 2, size: Math.random() * 2 });
             }
 
             window.addEventListener('keydown', (e) => {
-                if (e.key === 'w' || e.key === 'ArrowUp') keys.up = true;
-                if (e.key === 's' || e.key === 'ArrowDown') keys.down = true;
-                if (e.key === 'a' || e.key === 'ArrowLeft') keys.left = true;
-                if (e.key === 'd' || e.key === 'ArrowRight') keys.right = true;
+                if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') { keys.up = true; document.getElementById('btn-up')?.classList.add('active'); }
+                if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') { keys.down = true; document.getElementById('btn-down')?.classList.add('active'); }
+                if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') { keys.left = true; document.getElementById('btn-left')?.classList.add('active'); }
+                if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') { keys.right = true; document.getElementById('btn-right')?.classList.add('active'); }
                 if (e.key === ' ') { e.preventDefault(); triggerRockyShield(); }
             });
 
             window.addEventListener('keyup', (e) => {
-                if (e.key === 'w' || e.key === 'ArrowUp') keys.up = false;
-                if (e.key === 's' || e.key === 'ArrowDown') keys.down = false;
-                if (e.key === 'a' || e.key === 'ArrowLeft') keys.left = false;
-                if (e.key === 'd' || e.key === 'ArrowRight') keys.right = false;
+                if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') { keys.up = false; document.getElementById('btn-up')?.classList.remove('active'); }
+                if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') { keys.down = false; document.getElementById('btn-down')?.classList.remove('active'); }
+                if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') { keys.left = false; document.getElementById('btn-left')?.classList.remove('active'); }
+                if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') { keys.right = false; document.getElementById('btn-right')?.classList.remove('active'); }
             });
 
             function triggerRockyShield() {
@@ -244,12 +338,13 @@ def render_hail_mary_game(user: dict):
                 document.getElementById('gameover-screen').style.display = 'none';
                 
                 gameState = 'PLAYING';
-                ship = { x: 100, y: 210, speed: 4.5, shields: 100 };
-                rocky = { x: 60, y: 240, pulse: 0, shieldActive: 0 };
+                ship = { x: 100, y: 190, speed: 4.5, shields: 100 };
+                rocky = { x: 60, y: 220, pulse: 0, shieldActive: 0 };
                 taumoebas = [];
                 astrophages = [];
                 collected = 0;
                 score = 0;
+                canvas.focus();
             }
 
             function endGame(win) {
@@ -448,5 +543,5 @@ def render_hail_mary_game(user: dict):
         </body>
         </html>
         """
-        components.html(game_html, height=550)
+        components.html(game_html, height=690)
 
