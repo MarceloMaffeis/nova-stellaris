@@ -11,7 +11,7 @@ import hashlib
 from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "nova_stellaris.db")
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "nova_stellaris.db")
 SECRET_SALT = "NovaStellaris_CosmicSecret_2026"
 
 def get_connection():

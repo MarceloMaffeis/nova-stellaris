@@ -4,8 +4,18 @@ Ponto de entrada principal com Autenticação (Alunos & Docentes),
 Painel Administrativo, Portal de Boas-Vindas e Navegação Divisional.
 """
 
-import streamlit as st
+import sys
 import os
+
+# Garantir que o diretório raiz e subpastas estejam no caminho de busca do Python no Streamlit Cloud
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+MODULES_DIR = os.path.join(BASE_DIR, "modules")
+if MODULES_DIR not in sys.path:
+    sys.path.insert(0, MODULES_DIR)
+
+import streamlit as st
 
 # Configuração da página
 st.set_page_config(
