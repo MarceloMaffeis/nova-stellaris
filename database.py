@@ -1,30 +1,46 @@
-﻿"""
+"""
 Nova Stellaris - Banco de Dados SQLite
-Gerenciamento de perfis, progresso, XP, insígnias e perguntas STEAM.
+Gerenciamento de autenticação, perfis (Alunos & Docentes), progresso, XP, 
+insígnias, avisos de sala de aula e perguntas STEAM.
 """
 
 import sqlite3
 import json
 import os
+import hashlib
 from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "nova_stellaris.db")
+SECRET_SALT = "NovaStellaris_CosmicSecret_2026"
 
 def get_connection():
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn
 
+def hash_password(password: str) -> str:
+    """Gera hash SHA-256 seguro com Salt."""
+    return hashlib.sha256(f"{SECRET_SALT}_{password}".encode("utf-8")).hexdigest()
+
+def verify_password(password: str, stored_hash: str) -> bool:
+    """Verifica se a senha coincide com o hash gravado."""
+    return hash_password(password) == stored_hash
+
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
     
+    # 1. Tabela de Usuários
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
-        avatar TEXT DEFAULT '🚀',
+        email TEXT DEFAULT '',
+        password_hash TEXT DEFAULT '',
+        role TEXT DEFAULT 'aluno',
+        class_name TEXT DEFAULT '6º Ano A',
+        avatar TEXT DEFAULT '👩‍🚀',
         xp INTEGER DEFAULT 0,
         level INTEGER DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -32,6 +48,20 @@ def init_db():
     )
     """)
     
+    # Migração de Colunas Existentes caso a tabela já tenha sido criada sem elas
+    cursor.execute("PRAGMA table_info(users)")
+    existing_cols = [row["name"] for row in cursor.fetchall()]
+    
+    if "email" not in existing_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN email TEXT DEFAULT ''")
+    if "password_hash" not in existing_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN password_hash TEXT DEFAULT ''")
+    if "role" not in existing_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'aluno'")
+    if "class_name" not in existing_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN class_name TEXT DEFAULT '6º Ano A'")
+        
+    # 2. Tabela de Insígnias
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_badges (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,6 +73,7 @@ def init_db():
     )
     """)
     
+    # 3. Tabela de Perguntas do Quiz
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS quiz_questions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,6 +88,7 @@ def init_db():
     )
     """)
     
+    # 4. Tabela de Tentativas do Quiz
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS quiz_attempts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,6 +102,7 @@ def init_db():
     )
     """)
     
+    # 5. Tabela de Progresso em Missões
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS mission_progress (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -84,6 +117,7 @@ def init_db():
     )
     """)
     
+    # 6. Tabela de Histórico do Chat com CosmoAI
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS chat_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -95,60 +129,382 @@ def init_db():
     )
     """)
     
+    # 7. Tabela de Favoritos
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_favorites (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
-        item_title TEXT NOT NULL,
-        item_url TEXT NOT NULL,
-        category TEXT NOT NULL,
+        item_type TEXT NOT NULL,
+        item_id TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user_id, item_url),
+        UNIQUE(user_id, item_type, item_id),
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
     """)
     
+    # 8. Tabela de Avisos & Desafios da Sala de Aula (Mural do Professor)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS classroom_announcements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        teacher_id INTEGER NOT NULL,
+        teacher_name TEXT NOT NULL,
+        class_name TEXT DEFAULT 'Todas as Turmas',
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        xp_reward INTEGER DEFAULT 50,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+    """)
+    
     conn.commit()
-    seed_quiz_questions(cursor, conn)
+    
+    # Inicializar dados padrão se necessário
+    _seed_default_users(cursor, conn)
+    _seed_default_questions(cursor, conn)
+    _seed_default_announcements(cursor, conn)
+    
     conn.close()
 
-def get_or_create_user(name: str = "AstroCadete", avatar: str = "🚀") -> Dict[str, Any]:
+def _seed_default_users(cursor, conn):
+    """Cria usuários padrão de demonstração para Aluno e Docente."""
+    # 1. Aluno Demo (Cadete Estelar)
+    cursor.execute("SELECT id FROM users WHERE name = ?", ("Cadete Estelar",))
+    if not cursor.fetchone():
+        pwd = hash_password("123456")
+        cursor.execute("""
+            INSERT INTO users (name, email, password_hash, role, class_name, avatar, xp, level)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, ("Cadete Estelar", "cadete@novastellaris.edu", pwd, "aluno", "6º Ano A", "👩‍🚀", 120, 1))
+        
+    # 2. Docente Demo (Professor Newton)
+    cursor.execute("SELECT id FROM users WHERE name = ?", ("Prof. Isaac Newton",))
+    if not cursor.fetchone():
+        pwd = hash_password("admin123")
+        cursor.execute("""
+            INSERT INTO users (name, email, password_hash, role, class_name, avatar, xp, level)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, ("Prof. Isaac Newton", "professor@novastellaris.edu", pwd, "docente", "Docente Geral", "👨‍🏫", 9999, 10))
+        
+    conn.commit()
+
+def _seed_default_announcements(cursor, conn):
+    """Cria aviso inicial no mural da turma."""
+    cursor.execute("SELECT COUNT(*) as count FROM classroom_announcements")
+    if cursor.fetchone()["count"] == 0:
+        cursor.execute("""
+            INSERT INTO classroom_announcements (teacher_id, teacher_name, class_name, title, content, xp_reward)
+            VALUES (
+                1, 
+                'Prof. Isaac Newton', 
+                'Todas as Turmas', 
+                '🚀 Boas-vindas à Missão do 6º Ano: Explorando o Sistema Solar!', 
+                'Olá Cadetes! Sejam bem-vindos à nossa Estação Nova Stellaris. Sua primeira tarefa é completar o Nível 1 da Trilha de Matemática e da Trilha de Física.', 
+                100
+            )
+        """)
+        conn.commit()
+
+def _seed_default_questions(cursor, conn):
+    """Popula banco com banco rico de perguntas se estiver vazio."""
+    cursor.execute("SELECT COUNT(*) as count FROM quiz_questions")
+    if cursor.fetchone()["count"] > 0:
+        return
+        
+    # Inserção das perguntas padrão
+    default_questions = [
+        ("Física", "Gravidade", "Fácil", "O que aconteceria com o seu peso se você viajasse para a Lua?", json.dumps(["Seu peso aumentaria 6 vezes", "Seu peso diminuiria para cerca de 1/6 do valor na Terra", "Seu peso continuaria exatamente igual", "Você ficaria sem massa"]), 1, "A gravidade na superfície da Lua é de apenas 1,62 m/s² (cerca de 1/6 da gravidade terrestre de 9,81 m/s²), logo sua força peso diminui!", "Os astronautas das missões Apollo saltitavam na Lua com facilidade carregando trajes pesados de 80 kg."),
+        ("Matemática", "Escala", "Fácil", "Se 1 Unidade Astronômica (1 UA) é a distância da Terra ao Sol (~150 milhões de km), quanto vale 2 UA?", json.dumps(["75 milhões de km", "300 milhões de km", "450 milhões de km", "1 bilhão de km"]), 1, "Basta multiplicar: 2 x 150.000.000 km = 300.000.000 km.", "Marte orbita a aproximadamente 1,5 UA do Sol."),
+        ("Química", "Forja Estelar", "Fácil", "Qual é o elemento químico mais leve e abundante no Universo e no Sol?", json.dumps(["Hélio (He)", "Hidrogênio (H)", "Oxigênio (O)", "Ferro (Fe)"]), 1, "O Hidrogênio (H) é o elemento número 1 da tabela periódica e compõe mais de 73% da matéria observável do Cosmos.", "No Sol, o hidrogênio se funde gerando hélio sob temperaturas de 15 milhões de graus!"),
+        ("Tecnologia", "Computação", "Fácil", "Qual é o sistema numérico básico utilizado pelos computadores e sondas espaciais, composto apenas por 0 e 1?", json.dumps(["Sistema Decimal", "Sistema Romano", "Sistema Binário", "Sistema Hexadecimal"]), 2, "O sistema binário (base 2) usa os dígitos 0 e 1, correspondendo a estados desligado/ligado nos circuitos eletrônicos.", "A sonda Voyager 1 transmite dados binários através de ondas de rádio a mais de 24 bilhões de km da Terra.")
+    ]
+    
+    cursor.executemany("""
+        INSERT INTO quiz_questions (pillar, category, difficulty, question, options_json, correct_idx, explanation, sci_fi_fact)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, default_questions)
+    conn.commit()
+
+
+# ==============================================================================
+# AUTENTICAÇÃO & GESTÃO DE USUÁRIOS
+# ==============================================================================
+def register_user(name: str, password: str, role: str = "aluno", avatar: str = "👩‍🚀", class_name: str = "6º Ano A", email: str = "") -> Tuple[bool, str, Optional[Dict[str, Any]]]:
+    """Registra um novo usuário com senha criptografada."""
+    name = name.strip()
+    if not name:
+        return False, "O nome de usuário não pode estar em branco.", None
+    if len(password) < 4:
+        return False, "A senha deve conter pelo menos 4 caracteres.", None
+        
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    try:
+        pwd_hash = hash_password(password)
+        cursor.execute("""
+            INSERT INTO users (name, email, password_hash, role, class_name, avatar, xp, level)
+            VALUES (?, ?, ?, ?, ?, ?, 0, 1)
+        """, (name, email.strip(), pwd_hash, role, class_name, avatar))
+        conn.commit()
+        user_id = cursor.lastrowid
+        cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+        user_dict = dict(cursor.fetchone())
+        conn.close()
+        return True, "Cadastro realizado com sucesso!", user_dict
+    except sqlite3.IntegrityError:
+        conn.close()
+        return False, "Já existe um usuário cadastrado com esse nome. Escolha outro nome ou faça login.", None
+    except Exception as e:
+        conn.close()
+        return False, f"Erro ao cadastrar: {str(e)}", None
+
+def authenticate_user(login_identifier: str, password: str) -> Optional[Dict[str, Any]]:
+    """Autentica por nome de usuário ou email."""
+    login_identifier = login_identifier.strip()
+    if not login_identifier or not password:
+        return None
+        
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT * FROM users 
+        WHERE name = ? OR (email != '' AND email = ?)
+    """, (login_identifier, login_identifier))
+    row = cursor.fetchone()
+    
+    if not row:
+        conn.close()
+        return None
+        
+    user = dict(row)
+    # Se o usuário não tem senha cadastrada (antigo), aceita qualquer senha e salva o hash
+    if not user.get("password_hash"):
+        new_hash = hash_password(password)
+        cursor.execute("UPDATE users SET password_hash = ? WHERE id = ?", (new_hash, user["id"]))
+        conn.commit()
+        conn.close()
+        return user
+        
+    if verify_password(password, user["password_hash"]):
+        cursor.execute("UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?", (user["id"],))
+        conn.commit()
+        conn.close()
+        return user
+        
+    conn.close()
+    return None
+
+def get_user_by_id(user_id: int) -> Optional[Dict[str, Any]]:
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def get_or_create_user(name: str = "Cadete Estelar", avatar: str = "👩‍🚀") -> Dict[str, Any]:
+    """Mantém compatibilidade com sessões legadas."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users WHERE name = ?", (name,))
     row = cursor.fetchone()
+    if row:
+        user_dict = dict(row)
+        conn.close()
+        return user_dict
     
-    if not row:
-        cursor.execute("INSERT INTO users (name, avatar, xp, level) VALUES (?, ?, 0, 1)", (name, avatar))
-        conn.commit()
-        user_id = cursor.lastrowid
-        cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
-        row = cursor.fetchone()
-        unlock_badge(user_id, "first_login")
-    else:
-        cursor.execute("UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?", (row["id"],))
-        conn.commit()
-        
-    user_dict = dict(row)
+    pwd_hash = hash_password("123456")
+    cursor.execute("""
+        INSERT INTO users (name, password_hash, role, class_name, avatar, xp, level)
+        VALUES (?, ?, 'aluno', '6º Ano A', ?, 0, 1)
+    """, (name, pwd_hash, avatar))
+    conn.commit()
+    user_id = cursor.lastrowid
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    user_dict = dict(cursor.fetchone())
     conn.close()
     return user_dict
 
-def update_user_profile(user_id: int, name: str, avatar: str):
+def update_user_profile(user_id: int, new_name: str, new_avatar: str, new_class: str = None) -> bool:
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE users SET name = ?, avatar = ? WHERE id = ?", (name, avatar, user_id))
-    conn.commit()
-    conn.close()
+    try:
+        if new_class:
+            cursor.execute("UPDATE users SET name = ?, avatar = ?, class_name = ? WHERE id = ?", (new_name, new_avatar, new_class, user_id))
+        else:
+            cursor.execute("UPDATE users SET name = ?, avatar = ? WHERE id = ?", (new_name, new_avatar, user_id))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception:
+        conn.close()
+        return False
 
-def add_xp(user_id: int, xp_amount: int) -> int:
+def reset_user_password(user_id: int, new_password: str) -> bool:
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE users SET xp = xp + ? WHERE id = ?", (xp_amount, user_id))
-    conn.commit()
-    cursor.execute("SELECT xp FROM users WHERE id = ?", (user_id,))
-    new_xp = cursor.fetchone()["xp"]
+    try:
+        pwd_hash = hash_password(new_password)
+        cursor.execute("UPDATE users SET password_hash = ? WHERE id = ?", (pwd_hash, user_id))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception:
+        conn.close()
+        return False
+
+def delete_user(user_id: int) -> bool:
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception:
+        conn.close()
+        return False
+
+
+# ==============================================================================
+# PAINEL DO DOCENTE / GESTÃO DE TURMAS
+# ==============================================================================
+def get_all_students(class_filter: Optional[str] = None) -> List[Dict[str, Any]]:
+    conn = get_connection()
+    cursor = conn.cursor()
+    if class_filter and class_filter != "Todas as Turmas":
+        cursor.execute("""
+            SELECT u.*, 
+                   COUNT(b.id) as badges_count,
+                   COUNT(q.id) as quiz_attempts_count
+            FROM users u
+            LEFT JOIN user_badges b ON u.id = b.user_id
+            LEFT JOIN quiz_attempts q ON u.id = q.user_id
+            WHERE u.role = 'aluno' AND u.class_name = ?
+            GROUP BY u.id
+            ORDER BY u.xp DESC
+        """, (class_filter,))
+    else:
+        cursor.execute("""
+            SELECT u.*, 
+                   COUNT(b.id) as badges_count,
+                   COUNT(q.id) as quiz_attempts_count
+            FROM users u
+            LEFT JOIN user_badges b ON u.id = b.user_id
+            LEFT JOIN quiz_attempts q ON u.id = q.user_id
+            WHERE u.role = 'aluno'
+            GROUP BY u.id
+            ORDER BY u.xp DESC
+        """)
+    rows = cursor.fetchall()
     conn.close()
-    return new_xp
+    return [dict(r) for r in rows]
+
+def get_all_classes() -> List[str]:
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT class_name FROM users WHERE class_name != '' AND role = 'aluno' ORDER BY class_name")
+    rows = cursor.fetchall()
+    conn.close()
+    classes = [r["class_name"] for r in rows]
+    return classes if classes else ["6º Ano A", "6º Ano B", "7º Ano A", "8º Ano A", "9º Ano A", "Clube de Astronomia"]
+
+def get_class_stats(class_filter: Optional[str] = None) -> Dict[str, Any]:
+    students = get_all_students(class_filter)
+    total_students = len(students)
+    if total_students == 0:
+        return {
+            "total_students": 0,
+            "avg_xp": 0,
+            "total_xp": 0,
+            "total_badges": 0,
+            "top_student": "Nenhum"
+        }
+        
+    total_xp = sum(s["xp"] for s in students)
+    avg_xp = total_xp / total_students
+    total_badges = sum(s["badges_count"] for s in students)
+    top_student = students[0]["name"] if students else "Nenhum"
+    
+    return {
+        "total_students": total_students,
+        "avg_xp": avg_xp,
+        "total_xp": total_xp,
+        "total_badges": total_badges,
+        "top_student": top_student
+    }
+
+def award_bonus_xp(user_id: int, xp_amount: int, reason: str = "Participação em Aula") -> bool:
+    """O professor concede XP bônus para um aluno específico."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE users SET xp = xp + ? WHERE id = ?", (xp_amount, user_id))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception:
+        conn.close()
+        return False
+
+
+# ==============================================================================
+# MURAL DE AVISOS & MISSÕES DA SALA DE AULA
+# ==============================================================================
+def create_announcement(teacher_id: int, teacher_name: str, title: str, content: str, class_name: str = "Todas as Turmas", xp_reward: int = 50) -> int:
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO classroom_announcements (teacher_id, teacher_name, class_name, title, content, xp_reward)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (teacher_id, teacher_name, class_name, title.strip(), content.strip(), xp_reward))
+    conn.commit()
+    ann_id = cursor.lastrowid
+    conn.close()
+    return ann_id
+
+def get_announcements(class_filter: Optional[str] = None) -> List[Dict[str, Any]]:
+    conn = get_connection()
+    cursor = conn.cursor()
+    if class_filter and class_filter != "Todas as Turmas":
+        cursor.execute("""
+            SELECT * FROM classroom_announcements
+            WHERE class_name = 'Todas as Turmas' OR class_name = ?
+            ORDER BY created_at DESC
+        """, (class_filter,))
+    else:
+        cursor.execute("SELECT * FROM classroom_announcements ORDER BY created_at DESC")
+    rows = cursor.fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def delete_announcement(ann_id: int) -> bool:
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM classroom_announcements WHERE id = ?", (ann_id,))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception:
+        conn.close()
+        return False
+
+
+# ==============================================================================
+# XP & INSÍGNIAS
+# ==============================================================================
+def add_xp(user_id: int, amount: int) -> int:
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET xp = xp + ?, last_active = CURRENT_TIMESTAMP WHERE id = ?", (amount, user_id))
+    cursor.execute("SELECT xp FROM users WHERE id = ?", (user_id,))
+    row = cursor.fetchone()
+    conn.commit()
+    conn.close()
+    return row["xp"] if row else 0
 
 def unlock_badge(user_id: int, badge_id: str) -> bool:
     conn = get_connection()
@@ -170,69 +526,25 @@ def get_user_badges(user_id: int) -> List[str]:
     conn.close()
     return [r["badge_id"] for r in rows]
 
-def get_quiz_questions(pillar: Optional[str] = None, difficulty: Optional[str] = None, limit: int = 10) -> List[Dict[str, Any]]:
-    conn = get_connection()
-    cursor = conn.cursor()
-    
-    query = "SELECT * FROM quiz_questions WHERE 1=1"
-    params = []
-    
-    if pillar and pillar != "Todos":
-        query += " AND pillar = ?"
-        params.append(pillar)
-    if difficulty and difficulty != "Todos":
-        query += " AND difficulty = ?"
-        params.append(difficulty)
-        
-    query += " ORDER BY RANDOM() LIMIT ?"
-    params.append(limit)
-    
-    cursor.execute(query, params)
-    rows = cursor.fetchall()
-    
-    results = []
-    for r in rows:
-        d = dict(r)
-        d["options"] = json.loads(d["options_json"])
-        results.append(d)
-        
-    conn.close()
-    return results
-
-def record_quiz_attempt(user_id: int, question_id: int, is_correct: bool, xp_earned: int):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO quiz_attempts (user_id, question_id, is_correct, xp_earned) VALUES (?, ?, ?, ?)",
-        (user_id, question_id, 1 if is_correct else 0, xp_earned)
-    )
-    conn.commit()
-    conn.close()
-    if xp_earned > 0:
-        add_xp(user_id, xp_earned)
-
 def get_user_stats(user_id: int) -> Dict[str, Any]:
     conn = get_connection()
     cursor = conn.cursor()
-    
-    cursor.execute("SELECT COUNT(*) as total, SUM(is_correct) as correct, SUM(xp_earned) as total_quiz_xp FROM quiz_attempts WHERE user_id = ?", (user_id,))
-    quiz_stat = cursor.fetchone()
-    
-    cursor.execute("SELECT COUNT(*) as badge_count FROM user_badges WHERE user_id = ?", (user_id,))
-    badge_stat = cursor.fetchone()
-    
-    cursor.execute("SELECT COUNT(*) as completed_missions FROM mission_progress WHERE user_id = ? AND completed = 1", (user_id,))
-    mission_stat = cursor.fetchone()
-    
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    user_row = cursor.fetchone()
+    cursor.execute("SELECT COUNT(*) as count FROM user_badges WHERE user_id = ?", (user_id,))
+    badge_count = cursor.fetchone()["count"]
+    cursor.execute("SELECT COUNT(*) as count, SUM(is_correct) as correct FROM quiz_attempts WHERE user_id = ?", (user_id,))
+    quiz_row = cursor.fetchone()
+    cursor.execute("SELECT COUNT(*) as count FROM mission_progress WHERE user_id = ? AND completed = 1", (user_id,))
+    missions_completed = cursor.fetchone()["count"]
     conn.close()
-    total_q = quiz_stat["total"] or 0
-    correct_q = quiz_stat["correct"] or 0
+    
     return {
-        "quizzes_played": total_q,
-        "quizzes_correct": correct_q,
-        "quiz_accuracy": round((correct_q / total_q * 100), 1) if total_q > 0 else 0,
-        "badges_count": badge_stat["badge_count"] or 0,
-        "completed_missions": mission_stat["completed_missions"] or 0
+        "user": dict(user_row) if user_row else {},
+        "badges_count": badge_count,
+        "quiz_total": quiz_row["count"] or 0,
+        "quiz_correct": quiz_row["correct"] or 0,
+        "missions_completed": missions_completed
     }
 
 def save_mission_progress(user_id: int, mission_key: str, stage: int, completed: bool, score: int):
@@ -250,15 +562,13 @@ def save_mission_progress(user_id: int, mission_key: str, stage: int, completed:
     conn.commit()
     conn.close()
 
-def get_mission_progress(user_id: int, mission_key: str) -> Dict[str, Any]:
+def get_mission_progress(user_id: int, mission_key: str) -> Optional[Dict[str, Any]]:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM mission_progress WHERE user_id = ? AND mission_key = ?", (user_id, mission_key))
     row = cursor.fetchone()
     conn.close()
-    if row:
-        return dict(row)
-    return {"stage": 1, "completed": 0, "score": 0}
+    return dict(row) if row else None
 
 def save_chat_message(user_id: int, sender: str, message: str):
     conn = get_connection()
@@ -267,240 +577,48 @@ def save_chat_message(user_id: int, sender: str, message: str):
     conn.commit()
     conn.close()
 
-def get_chat_history(user_id: int, limit: int = 20) -> List[Dict[str, str]]:
+def get_chat_history(user_id: int, limit: int = 50) -> List[Dict[str, Any]]:
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT sender, message FROM chat_history WHERE user_id = ? ORDER BY id ASC LIMIT ?", (user_id, limit))
+    cursor.execute("SELECT sender, message, created_at FROM chat_history WHERE user_id = ? ORDER BY id ASC LIMIT ?", (user_id, limit))
     rows = cursor.fetchall()
     conn.close()
-    return [{"role": r["sender"], "content": r["message"]} for r in rows]
+    return [dict(r) for r in rows]
 
-def seed_quiz_questions(cursor, conn):
-    cursor.execute("SELECT COUNT(*) FROM quiz_questions")
-    if cursor.fetchone()[0] > 0:
-        return
-        
-    questions = [
-        # --- FÍSICA ---
-        {
-            "pillar": "Física",
-            "category": "Gravidade",
-            "difficulty": "Cadete",
-            "question": "Se você pular na Lua, você sobe muito mais alto do que na Terra. Por que isso acontece?",
-            "options": [
-                "A Lua não tem chão sólido",
-                "A gravidade da Lua é cerca de 6 vezes menor que a da Terra porque ela tem menos massa",
-                "Na Lua você perde toda a sua massa corporal",
-                "O traje de astronauta tem molas especiais nos pés"
-            ],
-            "correct_idx": 1,
-            "explanation": "A força da gravidade depende da massa do corpo celeste. Como a Lua tem cerca de 1% da massa da Terra, sua atração gravitacional é 1/6 da terrestre!",
-            "sci_fi_fact": "Em Perdido em Marte, a gravidade é 38% da Terra, o que torna carregar equipamentos pesados bem mais fácil!"
-        },
-        {
-            "pillar": "Física",
-            "category": "Relatividade",
-            "difficulty": "Mestre",
-            "question": "No filme Interestelar, por que 1 hora no Planeta de Miller equivale a 7 anos na Terra?",
-            "options": [
-                "Porque o planeta gira muito rápido em torno do seu próprio eixo",
-                "Devido à extrema dilatação gravitacional do tempo causada pelo buraco negro gigante Gargantua",
-                "Porque a atmosfera de água altera a velocidade da luz",
-                "É apenas um erro de cálculo do computador TARS"
-            ],
-            "correct_idx": 1,
-            "explanation": "A Teoria da Relatividade Geral de Albert Einstein provou que quanto mais forte o campo gravitacional, mais devagar o tempo passa para quem está nele!",
-            "sci_fi_fact": "Kip Thorne, físico ganhador do Prêmio Nobel, fez os cálculos matemáticos exatos para o filme Interestelar!"
-        },
-        {
-            "pillar": "Física",
-            "category": "Gravidade Artificial",
-            "difficulty": "Cientista",
-            "question": "Em Devoradores de Estrelas e em estações espaciais circulares, como os cientistas criam gravidade artificial?",
-            "options": [
-                "Usando ímãs gigantes no chão da nave",
-                "Girando a nave em torno de um eixo central para gerar força centrífuga",
-                "Injetando oxigênio pressurizado",
-                "Usando matéria escura concentrada no casco"
-            ],
-            "correct_idx": 1,
-            "explanation": "A rotação gera uma aceleração centrípeta (que nós sentimos como força centrífuga contra o chão), empurrando os astronautas contra a parede interna!",
-            "sci_fi_fact": "Na nave Hail Mary, Ryland Grace ajusta a rotação para simular exatamente 1g (a gravidade normal da Terra)."
-        },
-        {
-            "pillar": "Física",
-            "category": "Velocidade de Escape",
-            "difficulty": "Cientista",
-            "question": "O que é Velocidade de Escape para um foguete?",
-            "options": [
-                "A velocidade necessária para escapar do trânsito na base de lançamento",
-                "A velocidade mínima para um objeto se libertar da atração gravitacional de um planeta sem cair de volta",
-                "A velocidade máxima que um motor a diesel consegue atingir",
-                "A velocidade da luz quando viaja no vácuo"
-            ],
-            "correct_idx": 1,
-            "explanation": "Na Terra, a velocidade de escape é cerca de 11,2 km/s (mais de 40.000 km/h). Em Marte, por ser menor, é apenas 5 km/s!",
-            "sci_fi_fact": "No livro Perdido em Marte, Mark Watney teve que retirar o escudo e partes do MAV para deixá-lo leve o suficiente para atingir a velocidade de escape!"
-        },
-
-        # --- MATEMÁTICA ---
-        {
-            "pillar": "Matemática",
-            "category": "Notação Científica",
-            "difficulty": "Cadete",
-            "question": "A distância média da Terra ao Sol é de aproximadamente 150.000.000 km. Como escrevemos esse número em Notação Científica?",
-            "options": [
-                "15 x 10^7 km",
-                "1,5 x 10^8 km",
-                "1,5 x 10^6 km",
-                "150 x 10^6 km"
-            ],
-            "correct_idx": 1,
-            "explanation": "Na notação científica, o número principal deve estar entre 1 e 10. Andamos a vírgula 8 casas para a esquerda: 1,5 × 10⁸ km!",
-            "sci_fi_fact": "Os astrônomos usam potências de 10 para medir o cosmos porque escrever zeros demais ocuparia páginas inteiras!"
-        },
-        {
-            "pillar": "Matemática",
-            "category": "Anos-Luz",
-            "difficulty": "Cientista",
-            "question": "A luz viaja a cerca de 300.000 km/s. Se 1 ano tem cerca de 31.500.000 segundos, aproximadamente quanto mede 1 Ano-Luz?",
-            "options": [
-                "Cerca de 9,46 trilhões de quilômetros (9,46 x 10^12 km)",
-                "Cerca de 300 mil quilômetros",
-                "Exatamente 1 bilhão de quilômetros",
-                "365 mil quilômetros"
-            ],
-            "correct_idx": 0,
-            "explanation": "Distância = Velocidade × Tempo. Multiplicando 300.000 km/s por 31.536.000 s obtemos aproximadamente 9.460.000.000.000 km!",
-            "sci_fi_fact": "A estrela mais próxima de nós depois do Sol (Próxima Centauri) fica a 4,24 anos-luz de distância."
-        },
-        {
-            "pillar": "Matemática",
-            "category": "Proporção & Tempo",
-            "difficulty": "Cadete",
-            "question": "Um Sol marciano dura 24 horas e 39 minutos. Se Mark Watney sobreviveu 100 Sols em Marte, isso equivale a:",
-            "options": [
-                "Exatamente 100 dias terrestres",
-                "Aproximadamente 102 dias e 17 horas terrestres",
-                "50 dias terrestres",
-                "200 dias terrestres"
-            ],
-            "correct_idx": 1,
-            "explanation": "Como cada Sol tem 39 minutos a mais que um dia na Terra, 100 Sols acumulam 3.900 minutos extras (65 horas, ou quase 2,7 dias extras)!",
-            "sci_fi_fact": "Os engenheiros da NASA que operam os robôs Curiosity e Perseverance ajustam seus relógios de pulso para o tempo de Marte!"
-        },
-
-        # --- QUÍMICA ---
-        {
-            "pillar": "Química",
-            "category": "Produção de Água",
-            "difficulty": "Cientista",
-            "question": "Em Perdido em Marte, como Mark Watney conseguiu fabricar água líquida para suas plantações?",
-            "options": [
-                "Derretendo cometas que caíram perto do habitat",
-                "Decompondo combustível de hidrazina (N2H4) em Hidrogênio (H2) e reagindo com Oxigênio (O2)",
-                "Filtrando a poeira vermelha marciana com café",
-                "Condensando vapor do ar marciano que é rico em umidade"
-            ],
-            "correct_idx": 1,
-            "explanation": "A reação clássica de formação de água é 2H₂ + O₂ → 2H₂O. Queimar hidrogênio com oxigênio produz água pura (embora seja uma reação explosiva e perigosa)!",
-            "sci_fi_fact": "Mark Watney calculou a estequiometria química com extrema precisão para não explodir a base inteira!"
-        },
-        {
-            "pillar": "Química",
-            "category": "Fusão Estelar",
-            "difficulty": "Cadete",
-            "question": "Qual reação química/nuclear faz o nosso Sol brilhar e gerar tanta energia?",
-            "options": [
-                "Queima contínua de carvão e petróleo espacial",
-                "Fusão nuclear: átomos de Hidrogênio se fundem para formar Hélio",
-                "Explosões contínuas de dinamite no núcleo",
-                "Oxidação de ferro com vapor d'água"
-            ],
-            "correct_idx": 1,
-            "explanation": "No núcleo das estrelas, temperaturas de mais de 15 milhões de graus fundem 4 prótons de Hidrogênio em 1 núcleo de Hélio, liberando energia pura segundo E = mc²!",
-            "sci_fi_fact": "Em Devoradores de Estrelas, os microrganismos chamados Astrofagos absorvem a luz do Sol através de energia de massa enriquecida!"
-        },
-        {
-            "pillar": "Química",
-            "category": "Origem dos Elementos",
-            "difficulty": "Mestre",
-            "question": "De onde vieram o ferro do nosso sangue, o cálcio dos nossos ossos e o ouro das joias?",
-            "options": [
-                "Foram criados no laboratório do Big Bang e nunca mais mudaram",
-                "Foram forjados no interior de estrelas massivas e espalhados pelo universo em explosões de Supernovas",
-                "Surgiram espontaneamente no solo dos planetas rochosos",
-                "Vieram da atmosfera de Júpiter"
-            ],
-            "correct_idx": 1,
-            "explanation": "Como dizia Carl Sagan: Somos todos poeira de estrelas. Todos os elementos químicos mais pesados que o hélio foram cozidos no núcleo de estrelas que explodiram!",
-            "sci_fi_fact": "O amigo alienígena Rocky em Devoradores de Estrelas tem sangue baseado em mercúrio e exoesqueleto de xenonite!"
-        },
-
-        # --- TECNOLOGIA COMPUTACIONAL ---
-        {
-            "pillar": "Computação",
-            "category": "Código Hexadecimal",
-            "difficulty": "Cientista",
-            "question": "Em Perdido em Marte, como Mark Watney conseguiu conversar com a NASA usando a câmera da Pathfinder que só girava 360 graus?",
-            "options": [
-                "Ele colocou as 26 letras do alfabeto ao redor da sonda com ângulos muito pequenos",
-                "Ele usou o sistema Hexadecimal (0 a 9 e A a F), dividindo o círculo em 16 posições de 22,5 graus",
-                "Ele usou sinais de fumaça digital",
-                "Ele programou um aplicativo de WhatsApp para a sonda"
-            ],
-            "correct_idx": 1,
-            "explanation": "Com 26 letras + números, o espaçamento angular era de apenas 10 graus (muito fácil de errar a leitura). Com Hexadecimal (16 caracteres), cada letra da tabela ASCII era enviada em 2 dígitos perfeitos!",
-            "sci_fi_fact": "A tabela ASCII codifica letras como A = 41 (Hex) e M = 4D (Hex). Ciência da computação salvando vidas!"
-        },
-        {
-            "pillar": "Computação",
-            "category": "Binário & Radiação",
-            "difficulty": "Cadete",
-            "question": "Computadores espaciais operam usando o sistema binário (0s e 1s). Por que a memória de computadores no espaço precisa de blindagem especial (Rad-Hard)?",
-            "options": [
-                "Para não esquentar com a bateria",
-                "Porque raios cósmicos e radiação espacial podem inverter bits na memória (Bit-flip) e causar erros críticos",
-                "Para impedir que alienígenas instalem vírus",
-                "Porque o vácuo apaga arquivos salvos no disco"
-            ],
-            "correct_idx": 1,
-            "explanation": "Partículas de alta energia do Sol e do espaço podem atravessar chips de silício e mudar um bit 0 para 1. Computadores espaciais usam redundância tripla para checagem!",
-            "sci_fi_fact": "A sonda Voyager 1 tem 3 computadores idênticos que votam entre si para garantir que nenhum comando seja executado errado!"
-        },
-        {
-            "pillar": "Computação",
-            "category": "Robôs e Algoritmos",
-            "difficulty": "Mestre",
-            "question": "Por que o Rover Perseverance precisa de algoritmos de direção autônoma (AutoNav) em vez de ser controlado com um joystick ao vivo da Terra?",
-            "options": [
-                "Porque os astronautas na Terra dormem durante a noite de Marte",
-                "Porque o sinal de rádio da Terra leva entre 4 e 24 minutos para chegar a Marte, tornando impossível reagir a tempo de evitar um obstáculo",
-                "Porque joysticks não funcionam com satélites",
-                "Porque o rover se recusa a receber comandos humanos"
-            ],
-            "correct_idx": 1,
-            "explanation": "Devido à velocidade finita da luz (300.000 km/s) e à distância de até 400 milhões de km, a latência de comunicação é de até 20 minutos só de ida!",
-            "sci_fi_fact": "O robô TARS em Interestelar possuía parâmetros de inteligência ajustáveis, como 90% de honestidade e 75% de senso de humor!"
-        }
-    ]
+def get_quiz_questions(pillar: Optional[str] = None, difficulty: Optional[str] = None, limit: int = 10) -> List[Dict[str, Any]]:
+    conn = get_connection()
+    cursor = conn.cursor()
+    query = "SELECT * FROM quiz_questions WHERE 1=1"
+    params = []
+    if pillar and pillar != "Todos":
+        query += " AND pillar = ?"
+        params.append(pillar)
+    if difficulty and difficulty != "Todos":
+        query += " AND difficulty = ?"
+        params.append(difficulty)
+    query += " ORDER BY RANDOM() LIMIT ?"
+    params.append(limit)
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    conn.close()
     
-    for q in questions:
-        cursor.execute("""
-            INSERT INTO quiz_questions (pillar, category, difficulty, question, options_json, correct_idx, explanation, sci_fi_fact)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            q["pillar"],
-            q["category"],
-            q["difficulty"],
-            q["question"],
-            json.dumps(q["options"], ensure_ascii=False),
-            q["correct_idx"],
-            q["explanation"],
-            q.get("sci_fi_fact", "")
-        ))
-    conn.commit()
+    questions = []
+    for r in rows:
+        q = dict(r)
+        q["options"] = json.loads(q["options_json"])
+        questions.append(q)
+    return questions
 
-if __name__ == "__main__":
-    init_db()
-    print("Banco de dados Nova Stellaris inicializado com sucesso!")
+def save_quiz_attempt(user_id: int, question_id: int, is_correct: bool, xp_earned: int):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO quiz_attempts (user_id, question_id, is_correct, xp_earned)
+        VALUES (?, ?, ?, ?)
+    """, (user_id, question_id, 1 if is_correct else 0, xp_earned))
+    conn.commit()
+    conn.close()
+
+# Alias para compatibilidade
+record_quiz_attempt = save_quiz_attempt
+
