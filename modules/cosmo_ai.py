@@ -1,18 +1,13 @@
-"""
-Nova Stellaris - Módulo CosmoAI (Mentor Espacial)
-Interface de Chat Interativo com Google Gemini API e Gerador de Enigmas.
-"""
-
 import streamlit as st
-from gemini_service import ask_cosmo, generate_enigma
-from database import save_chat_message, get_chat_history, add_xp
+from gemini_service import ask_cosmo, generate_enigma, is_gemini_configured
+from database import save_chat_message, get_chat_history, clear_chat_history, add_xp
 
 def render_cosmo_ai(user: dict):
     st.markdown("""
         <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(30,16,60,0.95), rgba(16,20,47,0.95)); border: 1px solid #9d4edd;'>
-            <h1 style='color: #00d4ff; margin-bottom: 5px;'>🤖 CosmoAI — Seu Mentor Espacial</h1>
+            <h1 style='color: #00d4ff; margin-bottom: 5px;'>🤖 CosmoAI — Seu Mentor Espacial STEAM</h1>
             <p style='color: #cbd5e1; font-size: 1.1rem; margin: 0;'>
-                Tire dúvidas sobre Astronomia, Física, Matemática, Química, Computação e seus filmes de ficção favoritos!
+                Tire dúvidas sobre Astronomia, Física, Matemática, Química, Computação e seus filmes de ficção científica favoritos!
             </p>
         </div>
     """, unsafe_allow_html=True)
@@ -20,9 +15,32 @@ def render_cosmo_ai(user: dict):
     col_chat, col_tools = st.columns([2, 1])
     
     # ----------------------------------------------------
-    # COLUNA DA DIREITA: FERRAMENTAS & ENIGMAS
+    # COLUNA DA DIREITA: FERRAMENTAS & CONFIGURAÇÃO
     # ----------------------------------------------------
     with col_tools:
+        # Status da Conexão
+        online = is_gemini_configured()
+        if online:
+            st.markdown("""
+                <div style='background: rgba(6,214,160,0.15); border: 1px solid #06d6a0; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px;'>
+                    <span style='color: #06d6a0; font-size: 0.85rem; font-weight: bold;'>🟢 Google Gemini Ativado (Online)</span>
+                </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+                <div style='background: rgba(0,212,255,0.12); border: 1px solid #00d4ff; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px;'>
+                    <span style='color: #00d4ff; font-size: 0.85rem; font-weight: bold;'>⚡ Motor de Conhecimento STEAM (Local)</span>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        with st.expander("🔑 Chave Gemini API (Opcional)", expanded=False):
+            st.caption("Insira sua chave gratuita do Google AI Studio se desejar respostas 100% livres e generativas na nuvem:")
+            custom_key = st.text_input("Chave de API do Gemini:", type="password", value=st.session_state.get("custom_gemini_api_key", ""), key="input_custom_gemini_key")
+            if st.button("Salvar Chave", key="btn_save_gemini_key"):
+                st.session_state["custom_gemini_api_key"] = custom_key
+                st.success("Chave salva na sessão!")
+                st.rerun()
+
         st.markdown("""
             <div class='cosmic-card'>
                 <h3 style='color: #ffd166; margin-top: 0;'>⚡ Perguntas Rápidas</h3>
@@ -31,16 +49,18 @@ def render_cosmo_ai(user: dict):
         """, unsafe_allow_html=True)
         
         quick_prompts = [
+            "🧪 Quais componentes químicos formam o corpo humano?",
             "🕳️ Como funciona a dilatação do tempo em Interestelar?",
             "🥔 Como Mark Watney fez água em Perdido em Marte?",
             "✨ O que são os Astrofagos em Devoradores de Estrelas?",
-            "🧪 De onde vieram os átomos do meu corpo?",
+            "🚀 Como um foguete voa no vácuo do espaço?",
             "💻 Por que os computadores espaciais usam código binário?"
         ]
         
         for q in quick_prompts:
             if st.button(q, key=f"quick_{q}"):
                 st.session_state["user_question_input"] = q
+                st.rerun()
                 
         st.markdown("---")
         st.markdown("### 🎲 Gerador de Enigmas")
@@ -64,7 +84,13 @@ def render_cosmo_ai(user: dict):
     # COLUNA PRINCIPAL: CHAT STREAMLIT
     # ----------------------------------------------------
     with col_chat:
-        st.subheader("💬 Diálogo com o Cosmo")
+        c_head1, c_head2 = st.columns([3, 1])
+        with c_head1:
+            st.subheader("💬 Diálogo com o Cosmo")
+        with c_head2:
+            if st.button("🗑️ Limpar Chat", use_container_width=True, key="btn_clear_chat"):
+                clear_chat_history(user["id"])
+                st.rerun()
         
         # Carregar histórico do banco de dados
         history = get_chat_history(user["id"], limit=30)
@@ -76,7 +102,7 @@ def render_cosmo_ai(user: dict):
                 st.markdown("""
                     <div class='chat-cosmo'>
                         <strong>🤖 Cosmo:</strong> Olá, jovem explorador(a)! Eu sou o Cosmo, seu guia nesta viagem pelas maravilhas do universo. 
-                        O que você quer descobrir hoje? Podemos falar sobre buracos negros, robôs marcianos, ou como fazer cálculos de foguetes! 🚀
+                        O que você quer descobrir hoje? Podemos falar sobre buracos negros, robôs marcianos, a química do seu corpo ou como fazer cálculos de foguetes! 🚀
                     </div>
                 """, unsafe_allow_html=True)
             else:

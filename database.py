@@ -599,6 +599,18 @@ def get_chat_history(user_id: int, limit: int = 50) -> List[Dict[str, Any]]:
         result.append(d)
     return result
 
+def clear_chat_history(user_id: int) -> bool:
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM chat_history WHERE user_id = ?", (user_id,))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception:
+        conn.close()
+        return False
+
 def get_quiz_questions(pillar: Optional[str] = None, difficulty: Optional[str] = None, limit: int = 10) -> List[Dict[str, Any]]:
     conn = get_connection()
     cursor = conn.cursor()
