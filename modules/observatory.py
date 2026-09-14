@@ -1,6 +1,7 @@
 """
 Nova Stellaris - Módulo Observatório do Cosmos
-Atlas Celeste, Balança Planetária, Calculadora de Velocidade e Imagem Astronômica do Dia.
+Atlas Celeste com Imagens Reais da NASA/Wikimedia, Balança Planetária, 
+Calculadora de Viagem Espacial e Galeria de Imagens em Alta Resolução do James Webb & Hubble.
 """
 
 import streamlit as st
@@ -14,6 +15,7 @@ CELESTIAL_BODIES = {
     "Sol": {
         "type": "Estrela (Anã Amarela)",
         "icon": "☀️",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg/800px-The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg",
         "diameter_km": 1392700,
         "gravity_ms2": 274.0,
         "gravity_ratio": 27.9,
@@ -26,6 +28,7 @@ CELESTIAL_BODIES = {
     "Mercúrio": {
         "type": "Planeta Rochoso",
         "icon": "🪨",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Mercury_in_color_-_Prockter07-edit1.jpg/800px-Mercury_in_color_-_Prockter07-edit1.jpg",
         "diameter_km": 4879,
         "gravity_ms2": 3.7,
         "gravity_ratio": 0.38,
@@ -38,6 +41,7 @@ CELESTIAL_BODIES = {
     "Vênus": {
         "type": "Planeta Rochoso",
         "icon": "🟡",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Venus-real_color.jpg/800px-Venus-real_color.jpg",
         "diameter_km": 12104,
         "gravity_ms2": 8.87,
         "gravity_ratio": 0.90,
@@ -50,6 +54,7 @@ CELESTIAL_BODIES = {
     "Terra": {
         "type": "Planeta Rochoso (Nosso Lar)",
         "icon": "🌍",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/800px-The_Earth_seen_from_Apollo_17.jpg",
         "diameter_km": 12742,
         "gravity_ms2": 9.81,
         "gravity_ratio": 1.0,
@@ -62,6 +67,7 @@ CELESTIAL_BODIES = {
     "Lua": {
         "type": "Satélite Natural",
         "icon": "🌕",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/800px-FullMoon2010.jpg",
         "diameter_km": 3474,
         "gravity_ms2": 1.62,
         "gravity_ratio": 0.165,
@@ -74,6 +80,7 @@ CELESTIAL_BODIES = {
     "Marte": {
         "type": "Planeta Rochoso (Planeta Vermelho)",
         "icon": "🔴",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/800px-OSIRIS_Mars_true_color.jpg",
         "diameter_km": 6779,
         "gravity_ms2": 3.72,
         "gravity_ratio": 0.38,
@@ -86,6 +93,7 @@ CELESTIAL_BODIES = {
     "Júpiter": {
         "type": "Gigante Gasoso",
         "icon": "🪐",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg/800px-Jupiter_and_its_shrunken_Great_Red_Spot.jpg",
         "diameter_km": 139820,
         "gravity_ms2": 24.79,
         "gravity_ratio": 2.53,
@@ -98,6 +106,7 @@ CELESTIAL_BODIES = {
     "Europa (Lua de Júpiter)": {
         "type": "Lua Oceânica Gelada",
         "icon": "🧊",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Europa-moon-spacecraft-crop.jpg/800px-Europa-moon-spacecraft-crop.jpg",
         "diameter_km": 3121,
         "gravity_ms2": 1.31,
         "gravity_ratio": 0.134,
@@ -110,6 +119,7 @@ CELESTIAL_BODIES = {
     "Saturno": {
         "type": "Gigante Gasoso com Anéis",
         "icon": "🪐",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Saturn_during_Equinox.jpg/800px-Saturn_during_Equinox.jpg",
         "diameter_km": 116460,
         "gravity_ms2": 10.44,
         "gravity_ratio": 1.06,
@@ -122,6 +132,7 @@ CELESTIAL_BODIES = {
     "Titã (Lua de Saturno)": {
         "type": "Lua com Atmosfera Densa",
         "icon": "🌫️",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Titan_in_true_color.jpg/800px-Titan_in_true_color.jpg",
         "diameter_km": 5149,
         "gravity_ms2": 1.35,
         "gravity_ratio": 0.138,
@@ -131,9 +142,49 @@ CELESTIAL_BODIES = {
         "curiosity": "Tem chuva, rios e lagos líquidos, mas não de água: são lagos de Metano e Etano líquidos!",
         "scifi_link": "A atmosfera é tão espessa e a gravidade tão baixa que um humano com asas de papelão conseguiria voar batendo os braços!"
     },
+    "Urano": {
+        "type": "Gigante de Gelo",
+        "icon": "🌀",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Uranus2.jpg/800px-Uranus2.jpg",
+        "diameter_km": 50724,
+        "gravity_ms2": 8.69,
+        "gravity_ratio": 0.89,
+        "temp_c": -195,
+        "day_duration": "17h 14min",
+        "year_duration": "84 anos terrestres",
+        "curiosity": "Gira 'deitado' de lado com inclinação de 98°, provavelmente devido a um impacto titânico no passado!",
+        "scifi_link": "Possui uma cor azul-esverdeada brilhante provocada pela absorção de luz vermelha pelo gás metano em sua atmosfera."
+    },
+    "Netuno": {
+        "type": "Gigante de Gelo (Planeta dos Ventos)",
+        "icon": "💨",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Neptune_Full.jpg/800px-Neptune_Full.jpg",
+        "diameter_km": 49244,
+        "gravity_ms2": 11.15,
+        "gravity_ratio": 1.14,
+        "temp_c": -200,
+        "day_duration": "16h 06min",
+        "year_duration": "165 anos terrestres",
+        "curiosity": "Possui os ventos mais violentos de todo o Sistema Solar, ultrapassando 2.100 km/h (mais rápidos que a velocidade do som)!",
+        "scifi_link": "Foi descoberto através de cálculos puramente matemáticos antes de ser visto pelo telescópio!"
+    },
+    "Plutão": {
+        "type": "Planeta Anão do Cinturão de Kuiper",
+        "icon": "❄️",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Pluto_in_True_Color_-_High-Res.jpg/800px-Pluto_in_True_Color_-_High-Res.jpg",
+        "diameter_km": 2376,
+        "gravity_ms2": 0.62,
+        "gravity_ratio": 0.063,
+        "temp_c": -230,
+        "day_duration": "6,4 dias terrestres",
+        "year_duration": "248 anos terrestres",
+        "curiosity": "Possui uma gigantesca geleira de nitrogênio em formato de coração chamada Tombaugh Regio!",
+        "scifi_link": "Fotografado em detalhes estonteantes pela sonda New Horizons da NASA em 2015."
+    },
     "Gargantua (Buraco Negro)": {
-        "type": "Buraco Negro Supermassivo (Sci-Fi)",
+        "type": "Buraco Negro Supermassivo (Sci-Fi / Astrofísica)",
         "icon": "🕳️",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Black_hole_-_Messier_87_crop_max_res.jpg/800px-Black_hole_-_Messier_87_crop_max_res.jpg",
         "diameter_km": 300000000,
         "gravity_ms2": 99999.0,
         "gravity_ratio": 10000.0,
@@ -141,255 +192,266 @@ CELESTIAL_BODIES = {
         "day_duration": "Singularidade",
         "year_duration": "Indefinido",
         "curiosity": "Concentra a massa de 100 milhões de sóis! Sua atração é tão violenta que o tempo ao seu redor desacelera drasticamente.",
-        "scifi_link": "O buraco negro central do filme 'Interestelar', gerado com equações físicas reais por Kip Thorne."
+        "scifi_link": "O buraco negro central do filme 'Interestelar', gerado com equações físicas reais por Kip Thorne (Nobel de Física)."
     }
 }
 
 DISTANCES_KM = {
     "Lua": 384400,
     "Marte (Ponto Mais Próximo)": 54600000,
-    "Marte (Ponto Mais Distante)": 401000000,
-    "Júpiter": 628700000,
-    "Saturno": 1275000000,
-    "Plutão": 5900000000,
-    "Próxima Centauri (Estrela mais próxima)": 40140000000000,  # ~4.24 anos luz
-    "Centro da Via Láctea": 245000000000000000,                # ~26.000 anos luz
+    "Marte (Distância Média)": 225000000,
+    "Júpiter (Distância Média)": 778000000,
+    "Saturno (Distância Média)": 1430000000,
+    "Netuno (Fronteira dos Planetas)": 4500000000,
+    "Plutão (Cinturão de Kuiper)": 5900000000,
+    "Próxima Centauri (Estrela Mais Próxima)": 40140000000000
 }
 
-SPEEDS_KMH = {
+SPEED_MODES = {
     "🚶 Caminhada Humana (5 km/h)": 5,
-    "🚗 Carro em Rodovia (100 km/h)": 100,
+    "🚗 Carro de Corrida (200 km/h)": 200,
     "✈️ Avião a Jato Comercial (900 km/h)": 900,
-    "🚀 Foguete Apollo 11 (39.000 km/h)": 39000,
-    "🛰️ Sonda New Horizons (58.500 km/h)": 58500,
-    "⚡ 10% da Velocidade da Luz (108.000.000 km/h)": 108000000,
-    "💫 Velocidade da Luz (1.080.000.000 km/h)": 1080000000
+    "🚀 Ônibus Espacial / ISS (28.000 km/h)": 28000,
+    "⚡ Sonda New Horizons (58.000 km/h)": 58000,
+    "☀️ Sonda Solar Parker (700.000 km/h)": 700000,
+    "💡 Velocidade da Luz (1.079.252.848 km/h - 300.000 km/s)": 1079252848
 }
+
+JWST_HUBBLE_GALLERY = [
+    {
+        "title": "Pilares da Criação (Telescópio James Webb)",
+        "telescope": "JWST (Infravermelho Próximo / NIRCam)",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Pillars_of_creation_2014_HST_WFC3-UVIS_full-res_denoised.jpg/800px-Pillars_of_creation_2014_HST_WFC3-UVIS_full-res_denoised.jpg",
+        "description": "Colunas majestosas de poeira cósmica e gás hidrogênio na Nebulosa da Águia (a 6.500 anos-luz de nós), onde novas estrelas estão se acendendo agora!"
+    },
+    {
+        "title": "Primeiro Registro Real de um Buraco Negro (M87*)",
+        "telescope": "Event Horizon Telescope (EHT)",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Black_hole_-_Messier_87_crop_max_res.jpg/800px-Black_hole_-_Messier_87_crop_max_res.jpg",
+        "description": "A histórica primeira foto direta da sombra do horizonte de eventos de um buraco negro supermassivo no centro da galáxia Messier 87 (a 55 milhões de anos-luz)."
+    },
+    {
+        "title": "Galáxia de Andrômeda (M31)",
+        "telescope": "Observatórios Espaciais & Terrestres",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Andromeda_Galaxy_%28with_h-alpha%29.jpg/800px-Andromeda_Galaxy_%28with_h-alpha%29.jpg",
+        "description": "A galáxia espiral gigante mais próxima da nossa Via Láctea, contendo mais de 1 trilhão de estrelas a 2,5 milhões de anos-luz de distância."
+    },
+    {
+        "title": "A Terra Vista da Apollo 17 (The Blue Marble)",
+        "telescope": "Missão Apollo 17 da NASA (1972)",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/800px-The_Earth_seen_from_Apollo_17.jpg",
+        "description": "A fotografia mais icônica de nosso lar no Cosmos: um oásis azul e branco flutuando no vácuo escuro do espaço."
+    },
+    {
+        "title": "O Planeta Marte em Alta Resolução (Sonda OSIRIS)",
+        "telescope": "Sonda Espacial Rosetta / OSIRIS",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/800px-OSIRIS_Mars_true_color.jpg",
+        "description": "O Planeta Vermelho em cores reais: suas calotas polares de gelo seco e crateras gigantescas que outrora abrigaram rios e lagos de água líquida."
+    },
+    {
+        "title": "Júpiter e a Grande Mancha Vermelha",
+        "telescope": "Telescópio Espacial Hubble (NASA/ESA)",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg/800px-Jupiter_and_its_shrunken_Great_Red_Spot.jpg",
+        "description": "O rei dos planetas com suas faixas de nuvens turbulentas de amônia e a tempestade anticiclônica que ruge há centenas de anos."
+    }
+]
 
 def render_observatory(user: dict):
     st.markdown("""
         <div class='cosmic-hero'>
-            <h1 style='color: #00d4ff; margin-bottom: 5px;'>🌌 Observatório do Cosmos & Escala Espacial</h1>
-            <p style='color: #94a3b8; font-size: 1.1rem; margin: 0;'>
-                Explore os corpos celestes, calcule seu peso em outros mundos e viaje pelas distâncias do universo!
+            <h1 style='color: #00d4ff; margin-bottom: 5px;'>🌌 Observatório do Cosmos</h1>
+            <p style='color: #cbd5e1; font-size: 1.1rem; margin: 0;'>
+                Explore os mundos do Sistema Solar, compare gravidades, calcule viagens cósmicas e veja imagens em alta definição do James Webb!
             </p>
         </div>
     """, unsafe_allow_html=True)
     
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "🪐 Atlas dos Mundos",
-        "⚖️ Balança Planetária (Física & Peso)",
-        "🚀 Calculadora de Viagem Cósmica",
-        "📸 Foto Astronômica do Dia (APOD)"
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "🪐 Atlas Planetário",
+        "⚖️ Balança Interplanetária",
+        "🚀 Calculadora de Viagem",
+        "📸 Galeria James Webb & Hubble",
+        "🌠 Imagem Astronômica do Dia (NASA)"
     ])
     
-    # ----------------------------------------------------
-    # TAB 1: ATLAS DOS MUNDOS
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------
+    # TAB 1: ATLAS PLANETÁRIO
+    # ------------------------------------------------------------------
     with tab1:
-        st.subheader("🪐 Enciclopédia Interativa do Sistema Solar & Além")
+        st.subheader("🪐 Atlas do Sistema Solar e Mundos Fascinantes")
+        st.write("Clique em um astro para inspecionar seus dados físicos, imagens reais e conexões científicas:")
         
-        selected_body = st.selectbox(
-            "Selecione um corpo celeste para analisar:",
-            list(CELESTIAL_BODIES.keys()),
-            index=5 # Marte como default
-        )
+        selected_body = st.selectbox("Selecione um Corpo Celeste:", list(CELESTIAL_BODIES.keys()), index=3)
+        body = CELESTIAL_BODIES[selected_body]
         
-        body_data = CELESTIAL_BODIES[selected_body]
+        col_img, col_data = st.columns([1, 1.4])
         
-        col1, col2 = st.columns([1, 1])
-        
-        with col1:
+        with col_img:
+            st.image(body["image_url"], caption=f"{body['icon']} {selected_body} ({body['type']})", use_container_width=True)
+            
+        with col_data:
             st.markdown(f"""
                 <div class='cosmic-card'>
-                    <h2 style='color: #00d4ff;'>{body_data['icon']} {selected_body}</h2>
-                    <p><strong>Classificação:</strong> <span style='color: #ffd166;'>{body_data['type']}</span></p>
-                    <hr style='border-color: rgba(0,212,255,0.2);'>
-                    <p>📏 <strong>Diâmetro:</strong> {body_data['diameter_km']:,} km</p>
-                    <p>⚖️ <strong>Gravidade:</strong> {body_data['gravity_ms2']} m/s² ({body_data['gravity_ratio']}x a da Terra)</p>
-                    <p>🌡️ <strong>Temperatura Média:</strong> {body_data['temp_c']} °C</p>
-                    <p>🔄 <strong>Duração do Dia:</strong> {body_data['day_duration']}</p>
-                    <p>📅 <strong>Duração do Ano / Órbita:</strong> {body_data['year_duration']}</p>
+                    <div style='display: flex; align-items: center; justify-content: space-between;'>
+                        <h2 style='margin: 0; color: #00d4ff;'>{body['icon']} {selected_body}</h2>
+                        <span class='steam-tag physics'>{body['type']}</span>
+                    </div>
+                    <hr style='border-color: rgba(0,212,255,0.2); margin: 12px 0;'>
+                    <p style='font-size: 0.95rem; color: #cbd5e1;'><strong>📏 Diâmetro Equatorial:</strong> {body['diameter_km']:,} km</p>
+                    <p style='font-size: 0.95rem; color: #cbd5e1;'><strong>⚡ Aceleração da Gravidade:</strong> {body['gravity_ms2']} m/s² ({body['gravity_ratio']}x da Terra)</p>
+                    <p style='font-size: 0.95rem; color: #cbd5e1;'><strong>🌡️ Temperatura Média:</strong> {body['temp_c']} °C</p>
+                    <p style='font-size: 0.95rem; color: #cbd5e1;'><strong>⏱️ Duração do Dia:</strong> {body['day_duration']}</p>
+                    <p style='font-size: 0.95rem; color: #cbd5e1;'><strong>📅 Duração do Ano:</strong> {body['year_duration']}</p>
+                    <div style='background: rgba(0, 212, 255, 0.1); border-left: 3px solid #00d4ff; padding: 8px 12px; border-radius: 4px; margin-top: 10px;'>
+                        <p style='margin: 0; color: #f1f5f9; font-size: 0.85rem;'>💡 <strong>Fato Curioso:</strong> {body['curiosity']}</p>
+                    </div>
+                    <div style='background: rgba(157, 78, 221, 0.15); border-left: 3px solid #9d4edd; padding: 8px 12px; border-radius: 4px; margin-top: 8px;'>
+                        <p style='margin: 0; color: #f1f5f9; font-size: 0.85rem;'>🎬 <strong>Conexão Científica / Sci-Fi:</strong> {body['scifi_link']}</p>
+                    </div>
                 </div>
             """, unsafe_allow_html=True)
             
-        with col2:
-            st.markdown(f"""
-                <div class='cosmic-card' style='border-left: 4px solid #9d4edd;'>
-                    <h3 style='color: #9d4edd;'>💡 Fato Científico Curioso</h3>
-                    <p style='color: #e2e8f0;'>{body_data['curiosity']}</p>
-                    <h3 style='color: #06d6a0; margin-top: 20px;'>🎬 Conexão Sci-Fi & Filmes</h3>
-                    <p style='color: #e2e8f0;'>{body_data['scifi_link']}</p>
-                </div>
-            """, unsafe_allow_html=True)
-            
-        # Gráfico Comparativo de Tamanhos
-        st.markdown("### 📊 Comparador de Diâmetros Planetários (Escala)")
-        planets_only = {k: v for k, v in CELESTIAL_BODIES.items() if k not in ["Sol", "Gargantua (Buraco Negro)"]}
-        df_planets = pd.DataFrame([
-            {"Nome": k, "Diâmetro (km)": v["diameter_km"], "Tipo": v["type"]}
-            for k, v in planets_only.items()
-        ])
+        st.markdown("---")
+        st.markdown("### 📊 Comparação Interativa de Tamanhos dos Mundos")
         
-        fig = px.bar(
-            df_planets,
-            x="Nome",
-            y="Diâmetro (km)",
+        df_bodies = pd.DataFrame([
+            {"Corpo": k, "Diâmetro (km)": v["diameter_km"], "Tipo": v["type"]}
+            for k, v in CELESTIAL_BODIES.items()
+            if k != "Gargantua (Buraco Negro)"
+        ]).sort_values("Diâmetro (km)", ascending=True)
+        
+        fig_size = px.bar(
+            df_bodies,
+            x="Diâmetro (km)",
+            y="Corpo",
+            orientation="h",
             color="Diâmetro (km)",
             color_continuous_scale="Viridis",
-            title="Comparação de Tamanho dos Planetas e Luas (em km)"
+            title="Escala de Diâmetro dos Mundos do Sistema Solar (km)"
         )
-        fig.update_layout(
+        fig_size.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(19, 23, 43, 0.6)",
-            font=dict(color="#f1f5f9"),
-            margin=dict(l=20, r=20, t=40, b=20)
+            font=dict(color="#cbd5e1"),
+            height=450
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig_size, use_container_width=True)
 
-    # ----------------------------------------------------
-    # TAB 2: BALANÇA PLANETÁRIA
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------
+    # TAB 2: BALANÇA INTERPLANETÁRIA
+    # ------------------------------------------------------------------
     with tab2:
-        st.subheader("⚖️ Quanto você pesaria em outros mundos?")
-        st.markdown("""
-            A sua **Massa** (a quantidade de matéria no seu corpo) é a mesma em qualquer lugar do universo! 
-            Mas o seu **Peso** é uma força: **$P = m \cdot g$** (Peso = Massa × Gravidade local).
-        """)
+        st.subheader("⚖️ Balança Gravitacional Interplanetária")
+        st.write("A sua massa em quilogramas (kg) é constante em qualquer lugar do cosmos, mas o seu **PESO (Força Gravitacional)** muda drasticamente!")
         
-        user_weight = st.number_input(
-            "Digite seu peso na Terra (em kg):",
-            min_value=10.0,
-            max_value=150.0,
-            value=45.0,
-            step=1.0
-        )
+        user_weight = st.number_input("Digite sua massa na Terra (kg):", min_value=10.0, max_value=250.0, value=50.0, step=1.0)
         
-        col_w1, col_w2, col_w3 = st.columns(3)
-        
-        # Rastrear visualizações na sessão
-        if "tested_planets" not in st.session_state:
-            st.session_state.tested_planets = set()
+        cols = st.columns(4)
+        for i, (name, b_info) in enumerate(CELESTIAL_BODIES.items()):
+            equiv_weight = user_weight * b_info["gravity_ratio"]
+            target_col = cols[i % 4]
             
-        cards_data = [
-            ("Lua", "🌕", CELESTIAL_BODIES["Lua"]["gravity_ratio"], "#38bdf8", "Você daria pulos gigantes de astronauta!"),
-            ("Marte", "🔴", CELESTIAL_BODIES["Marte"]["gravity_ratio"], "#fb923c", "Carregar mochilas pesadas é muito fácil aqui!"),
-            ("Júpiter", "🪐", CELESTIAL_BODIES["Júpiter"]["gravity_ratio"], "#f43f5e", "Você mal conseguiria ficar em pé, pareceria chumbo!"),
-            ("Vênus", "🟡", CELESTIAL_BODIES["Vênus"]["gravity_ratio"], "#eab308", "Quase idêntico ao peso na Terra."),
-            ("Europa", "🧊", CELESTIAL_BODIES["Europa (Lua de Júpiter)"]["gravity_ratio"], "#06d6a0", "Flutuação suave sobre o manto de gelo!"),
-            ("Sol", "☀️", CELESTIAL_BODIES["Sol"]["gravity_ratio"], "#f59e0b", "Esmagamento instantâneo se pudesse pisar lá.")
-        ]
-        
-        for i, (name, icon, ratio, color, tip) in enumerate(cards_data):
-            calculated_weight = round(user_weight * ratio, 1)
-            st.session_state.tested_planets.add(name)
-            
-            target_col = [col_w1, col_w2, col_w3][i % 3]
             with target_col:
                 st.markdown(f"""
-                    <div class='cosmic-card' style='border-top: 4px solid {color}; text-align: center;'>
-                        <h3 style='margin: 0;'>{icon} {name}</h3>
-                        <p style='color: #94a3b8; font-size: 0.9rem;'>Gravidade: {ratio}x Terra</p>
-                        <h1 style='color: {color}; font-size: 2.4rem; margin: 10px 0;'>{calculated_weight} <span style='font-size: 1.2rem;'>kg</span></h1>
-                        <p style='font-size: 0.85rem; color: #cbd5e1;'>{tip}</p>
+                    <div style='background: rgba(19, 23, 43, 0.7); border: 1px solid rgba(0,212,255,0.25); border-radius: 12px; padding: 12px; text-align: center; margin-bottom: 12px;'>
+                        <span style='font-size: 2rem;'>{b_info['icon']}</span>
+                        <h4 style='color: #00d4ff; margin: 4px 0;'>{name}</h4>
+                        <p style='color: #ffd166; font-size: 1.2rem; font-weight: 800; margin: 0;'>{equiv_weight:.1f} kgf</p>
+                        <p style='color: #94a3b8; font-size: 0.75rem; margin: 0;'>Gravidade: {b_info['gravity_ratio']}x</p>
                     </div>
                 """, unsafe_allow_html=True)
                 
-        # Conquista de Gravidade
-        if len(st.session_state.tested_planets) >= 5:
-            if unlock_badge(user["id"], "gravity_explorer"):
-                add_xp(user["id"], 100)
-                st.balloons()
-                st.success("🎉 **Nova Conquista Desbloqueada:** ⚖️ Mestre da Gravidade! (+100 XP)")
+        if st.button("🌟 Registrar Experimento de Gravidade (+15 XP)"):
+            add_xp(user["id"], 15)
+            unlock_badge(user["id"], "observatory_explorer")
+            st.success("Experimento registrado com sucesso no seu Diário de Bordo! (+15 XP)")
 
-    # ----------------------------------------------------
-    # TAB 3: CALCULADORA DE VIAGEM CÓSMICA
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------
+    # TAB 3: CALCULADORA DE VIAGEM ESPACIAL
+    # ------------------------------------------------------------------
     with tab3:
-        st.subheader("🚀 Calculadora de Distâncias e Tempo de Viagem Espacial")
-        st.markdown("""
-            O espaço é incomensuravelmente gigante! Veja quanto tempo levaria para viajar da Terra até diferentes destinos usando vários veículos.
-        """)
+        st.subheader("🚀 Calculadora de Tempo de Viagem Interplanetária")
+        st.write("Descubra quanto tempo levaria para alcançar as fronteiras do espaço com diferentes veículos da humanidade:")
         
-        c_dest, c_speed = st.columns(2)
-        with c_dest:
-            chosen_dest = st.selectbox("Selecione o Destino:", list(DISTANCES_KM.keys()), index=1)
-        with c_speed:
-            chosen_speed_label = st.selectbox("Selecione a Velocidade:", list(SPEEDS_KMH.keys()), index=3)
+        col_calc1, col_calc2 = st.columns(2)
+        with col_calc1:
+            dest = st.selectbox("Escolha seu Destino:", list(DISTANCES_KM.keys()))
+            dist_km = DISTANCES_KM[dest]
+            st.info(f"📏 Distância em linha reta: **{dist_km:,.0f} km**".replace(",", "."))
             
-        dist_km = DISTANCES_KM[chosen_dest]
-        speed_kmh = SPEEDS_KMH[chosen_speed_label]
-        
-        hours = dist_km / speed_kmh
+        with col_calc2:
+            veh = st.selectbox("Escolha seu Meio de Transporte:", list(SPEED_MODES.keys()), index=3)
+            spd = SPEED_MODES[veh]
+            st.info(f"⚡ Velocidade de deslocamento: **{spd:,.0f} km/h**".replace(",", "."))
+            
+        hours = dist_km / spd
         days = hours / 24
         years = days / 365.25
         
         st.markdown(f"""
-            <div class='cosmic-card' style='background: linear-gradient(135deg, rgba(16,20,47,0.9), rgba(30,16,60,0.9)); border: 1px solid #00d4ff;'>
-                <h3 style='color: #00d4ff;'>🛰️ Relatório de Voo: Terra ➔ {chosen_dest}</h3>
-                <p>📍 <strong>Distância Total:</strong> {dist_km:,.0f} km (<span style='color: #f72585;'>{dist_km:.2e} km em Notação Científica</span>)</p>
-                <p>⚡ <strong>Velocidade de Cruzeiro:</strong> {speed_kmh:,.0f} km/h</p>
-                <hr style='border-color: rgba(255,255,255,0.1);'>
-                <h2 style='color: #ffd166; margin-top: 10px;'>⏱️ Tempo de Viagem Estimado:</h2>
+            <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(6,30,40,0.9), rgba(16,20,47,0.9)); border: 1px solid #06d6a0; margin-top: 15px;'>
+                <h3 style='color: #06d6a0; margin: 0;'>⏱️ Tempo Estimado de Viagem:</h3>
+                <h1 style='color: #ffffff; margin: 10px 0;'>
+                    {f"{years:,.1f} ANOS".replace(",", ".") if years >= 1.0 else (f"{days:,.1f} DIAS".replace(",", ".") if days >= 1.0 else f"{hours:,.1f} HORAS".replace(",", "."))}
+                </h1>
+                <p style='color: #cbd5e1; margin: 0;'>
+                    Equivale a exatamente <strong>{hours:,.0f} horas</strong> ({days:,.1f} dias terrestres) viajando ininterruptamente!
+                </p>
+            </div>
         """, unsafe_allow_html=True)
-        
-        if years >= 1.0:
-            st.markdown(f"<h1 style='color: #06d6a0;'>{years:,.1f} ANOS terrestres</h1>", unsafe_allow_html=True)
-            st.markdown(f"<p style='color: #94a3b8;'>({days:,.0f} dias ou {hours:,.0f} horas)</p>", unsafe_allow_html=True)
-        elif days >= 1.0:
-            st.markdown(f"<h1 style='color: #06d6a0;'>{days:,.1f} DIAS terrestres</h1>", unsafe_allow_html=True)
-            st.markdown(f"<p style='color: #94a3b8;'>({hours:,.1f} horas)</p>", unsafe_allow_html=True)
-        else:
-            st.markdown(f"<h1 style='color: #06d6a0;'>{hours:,.2f} HORAS ({hours*60:,.1f} minutos)</h1>", unsafe_allow_html=True)
-            
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        st.info("💡 **Dica Científica:** A luz do Sol leva cerca de **8 minutos e 20 segundos** para viajar 150 milhões de km e chegar aos nossos olhos na Terra!")
 
-    # ----------------------------------------------------
-    # TAB 4: APOD (FOTO ASTRONÔMICA DO DIA)
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------
+    # TAB 4: GALERIA JAMES WEBB & HUBBLE (ALTA RESOLUÇÃO)
+    # ------------------------------------------------------------------
     with tab4:
-        st.subheader("📸 Imagem Astronômica do Dia (NASA APOD)")
-        st.markdown("Imagens reais capturadas pelos telescópios espaciais James Webb, Hubble e observatórios mundiais.")
+        st.subheader("📸 Galeria Cósmica em Alta Resolução (NASA, JWST & Hubble)")
+        st.write("Imagens reais captadas pelos maiores observatórios e sondas da história da humanidade:")
         
-        try:
-            # Tentar requisição NASA APOD
-            res = requests.get("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY", timeout=4)
-            if res.status_code == 200:
-                apod_data = res.json()
-                st.markdown(f"### {apod_data.get('title', 'Maravilha Cósmica')}")
-                st.markdown(f"*Data: {apod_data.get('date', '')}*")
-                
-                if apod_data.get("media_type") == "image":
-                    st.image(apod_data.get("url"), use_container_width=True, caption=apod_data.get("title"))
-                else:
-                    st.video(apod_data.get("url"))
-                    
-                st.write(apod_data.get("explanation", ""))
-            else:
-                render_fallback_apod()
-        except Exception:
-            render_fallback_apod()
+        c_gal1, c_gal2 = st.columns(2)
+        
+        for idx, item in enumerate(JWST_HUBBLE_GALLERY):
+            target_col = c_gal1 if idx % 2 == 0 else c_gal2
+            with target_col:
+                with st.container():
+                    st.image(item["image_url"], caption=item["title"], use_container_width=True)
+                    st.markdown(f"""
+                        <div style='background: rgba(19, 23, 43, 0.75); border-left: 3px solid #00d4ff; padding: 10px 14px; border-radius: 8px; margin-bottom: 20px;'>
+                            <span class='steam-tag' style='background: rgba(0,212,255,0.15); color: #00d4ff; font-size: 0.75rem;'>🔭 {item['telescope']}</span>
+                            <h4 style='color: #f1f5f9; margin: 6px 0 4px 0;'>{item['title']}</h4>
+                            <p style='color: #cbd5e1; font-size: 0.85rem; margin: 0;'>{item['description']}</p>
+                        </div>
+                    """, unsafe_allow_html=True)
 
-def render_fallback_apod():
-    st.markdown("### 🌌 Os Pilares da Criação (Telescópio Espacial James Webb)")
-    st.image(
-        "https://images-assets.nasa.gov/image/PIA25432/PIA25432~orig.jpg",
-        caption="Os Pilares da Criação na Nebulosa da Águia (M16) em luz infravermelha próxima (NASA/ESA/CSA/STScI)",
-        use_container_width=True
-    )
-    st.markdown("""
-        <div class='cosmic-card'>
-            <h4 style='color: #00d4ff;'>O que estamos vendo aqui?</h4>
-            <p>
-                Esta é uma das imagens mais famosas de toda a astronomia! Localizados a 6.500 anos-luz da Terra na 
-                <strong>Nebulosa da Águia</strong>, estes imensos 'dedos' são gigantescas colunas de gás e poeira interestelar.
-            </p>
-            <p>
-                🧪 <strong>Química & Física:</strong> Dentro dessas nuvens densas de Hidrogênio, a gravidade está colapsando o gás, 
-                dando início às reações de fusão nuclear e criando <strong>novas estrelas e sistemas solares</strong> bem diante dos nossos olhos!
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
-
+    # ------------------------------------------------------------------
+    # TAB 5: APOD (NASA ASTRONOMY PICTURE OF THE DAY)
+    # ------------------------------------------------------------------
+    with tab5:
+        st.subheader("🌠 Imagem Astronômica do Dia (NASA APOD)")
+        st.write("A cada 24 horas, a NASA publica uma fotografia deslumbrante do cosmos acompanhada por uma explicação escrita por astrofísicos:")
+        
+        if st.button("🛰️ Conectar ao Feed Oficial da NASA APOD"):
+            try:
+                with st.spinner("Sintonizando telescópios da NASA..."):
+                    res = requests.get("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY", timeout=6)
+                    if res.status_code == 200:
+                        data = res.json()
+                        st.markdown(f"### {data.get('title', 'Maravilha Cósmica')}")
+                        st.caption(f"📅 Data da Captura: {data.get('date', 'Hoje')}")
+                        
+                        media_type = data.get("media_type", "image")
+                        if media_type == "image":
+                            st.image(data.get("url"), caption=data.get("title"), use_container_width=True)
+                        else:
+                            st.video(data.get("url"))
+                            
+                        st.markdown(f"""
+                            <div style='background: rgba(19, 23, 43, 0.7); border-left: 4px solid #00d4ff; padding: 14px; border-radius: 8px; margin-top: 15px;'>
+                                <h4 style='color: #00d4ff; margin-top: 0;'>📖 Explicação Científica Oficial (NASA):</h4>
+                                <p style='color: #e2e8f0; font-size: 0.9rem; line-height: 1.5;'>{data.get('explanation', 'Sem descrição disponível.')}</p>
+                            </div>
+                        """, unsafe_allow_html=True)
+                        add_xp(user["id"], 20)
+                    else:
+                        st.info("O feed da NASA está em manutenção de rotina no momento. Aproveite a Galeria James Webb na aba ao lado!")
+            except Exception:
+                st.info("Conexão ao feed da NASA indisponível no modo offline. Explore as imagens em alta resolução na aba **📸 Galeria James Webb & Hubble**!")
