@@ -1,4 +1,4 @@
-﻿"""
+"""
 Nova Stellaris - Módulo Astro-Valley (Simulador Web do Domo Marciano)
 Jogo 2D interativo estilo Stardew Valley Espacial em HTML5 Canvas + JS + Streamlit.
 """
@@ -43,10 +43,10 @@ def render_astro_valley(user: dict):
         
         with st.expander("🎁 Sincronizar Recompensas do Jogo", expanded=True):
             st.write("Conforme você colhe, gera energia e sobrevive a novos Sols, reivindique seu XP no botão abaixo:")
-            sync_sol = st.number_input("Sols Completados no Jogo:", min_value=1, max_value=100, value=1, step=1)
-            sync_harvest = st.number_input("Batatas Colhidas:", min_value=0, max_value=500, value=0, step=1)
+            sync_sol = st.number_input("Sols Completados no Jogo:", min_value=1, max_value=100, value=1, step=1, key="astro_valley_sol")
+            sync_harvest = st.number_input("Batatas Colhidas:", min_value=0, max_value=500, value=0, step=1, key="astro_valley_harvest")
             
-            if st.button("🌟 Reivindicar XP da Colônia!", type="primary"):
+            if st.button("🌟 Reivindicar XP da Colônia!", type="primary", key="astro_valley_claim_btn"):
                 earned_xp = (sync_sol * 25) + (sync_harvest * 15)
                 add_xp(user["id"], earned_xp)
                 

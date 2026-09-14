@@ -1,4 +1,4 @@
-﻿"""
+"""
 Nova Stellaris - Jogo Arcade: Operação Hail Mary (Devoradores de Estrelas)
 Jogo 2D em HTML5 Canvas + JS com tela de Início, Fim, Mecânicas de Som e Taumebas.
 """
@@ -35,10 +35,10 @@ def render_hail_mary_game(user: dict):
         
         with st.expander("🏆 Reivindicar XP da Missão", expanded=True):
             st.write("Após completar a missão ou atingir uma pontuação alta, salve seu XP:")
-            game_score = st.number_input("Sua Pontuação no Jogo:", min_value=0, max_value=5000, value=0, step=100)
-            mission_won = st.checkbox("Missão Cumprida (10 Taumebas)?", value=False)
+            game_score = st.number_input("Sua Pontuação no Jogo:", min_value=0, max_value=5000, value=0, step=100, key="hail_mary_score_input")
+            mission_won = st.checkbox("Missão Cumprida (10 Taumebas)?", value=False, key="hail_mary_won_check")
             
-            if st.button("🌟 Reivindicar Recompensas de Tau Ceti!", type="primary"):
+            if st.button("🌟 Reivindicar Recompensas de Tau Ceti!", type="primary", key="hail_mary_claim_btn"):
                 earned_xp = (game_score // 10) + (200 if mission_won else 20)
                 add_xp(user["id"], earned_xp)
                 if mission_won:

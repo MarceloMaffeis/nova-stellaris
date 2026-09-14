@@ -1,4 +1,4 @@
-﻿"""
+"""
 Nova Stellaris - Jogo Arcade: Interestelar (Manobra em Gargantua & Ondas de Miller)
 Jogo 2D em HTML5 Canvas + JS com Ondas Gigantes, Buraco Negro, Start, Fim e Dilatação do Tempo.
 """
@@ -35,10 +35,10 @@ def render_interstellar_game(user: dict):
         
         with st.expander("🏆 Reivindicar XP da Missão", expanded=True):
             st.write("Após realizar a manobra ou cruzar o Wormhole, reivindique seus pontos:")
-            game_score = st.number_input("Sua Pontuação no Jogo:", min_value=0, max_value=5000, value=0, step=100)
-            mission_won = st.checkbox("Cruzou o Wormhole com Sucesso?", value=False)
+            game_score = st.number_input("Sua Pontuação no Jogo:", min_value=0, max_value=5000, value=0, step=100, key="interstellar_score_input")
+            mission_won = st.checkbox("Cruzou o Wormhole com Sucesso?", value=False, key="interstellar_won_check")
             
-            if st.button("🌟 Reivindicar Recompensas Relativísticas!", type="primary"):
+            if st.button("🌟 Reivindicar Recompensas Relativísticas!", type="primary", key="interstellar_claim_btn"):
                 earned_xp = (game_score // 10) + (200 if mission_won else 25)
                 add_xp(user["id"], earned_xp)
                 if mission_won:
