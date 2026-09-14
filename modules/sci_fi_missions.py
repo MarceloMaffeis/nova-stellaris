@@ -3,10 +3,20 @@ Nova Stellaris - Módulo de Missões de Ficção Científica Interativas
 Simuladores baseados em "Perdido em Marte", "Devoradores de Estrelas" e "Interestelar".
 """
 
+import os
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 from database import add_xp, unlock_badge, save_mission_progress, get_mission_progress
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+IMG_DIR = os.path.join(BASE_DIR, "assets", "images")
+
+def get_img(filename: str) -> str:
+    local_p = os.path.join(IMG_DIR, filename)
+    if os.path.exists(local_p):
+        return local_p
+    return filename
 
 def render_sci_fi_missions(user: dict):
     st.markdown("""
@@ -39,7 +49,7 @@ def render_sci_fi_missions(user: dict):
 # MISSÃO 1: PERDIDO EM MARTE
 # ----------------------------------------------------------------------
 def render_the_martian_mission(user: dict):
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Perseverance_Selfie_at_Rochette_%28cropped%29.jpg/800px-Perseverance_Selfie_at_Rochette_%28cropped%29.jpg", caption="🔴 Superfície de Marte - Habitat da Missão Ares III", use_container_width=True)
+    st.image(get_img("perseverance.jpg"), caption="🔴 Superfície de Marte - Habitat da Missão Ares III", use_container_width=True)
     st.markdown("""
         <div class='cosmic-card' style='border-left: 5px solid #ff6b6b;'>
             <h2 style='color: #ff6b6b;'>🔴 Operação Acidalia: Sobrevivência Marciana</h2>
@@ -148,7 +158,7 @@ def render_the_martian_mission(user: dict):
 # MISSÃO 2: DEVORADORES DE ESTRELAS (PROJECT HAIL MARY)
 # ----------------------------------------------------------------------
 def render_hail_mary_mission(user: dict):
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Pillars_of_creation_2014_HST_WFC3-UVIS_full-res_denoised.jpg/800px-Pillars_of_creation_2014_HST_WFC3-UVIS_full-res_denoised.jpg", caption="✨ Espaço Profundo - Viagem Interestelar até Tau Ceti", use_container_width=True)
+    st.image(get_img("pillars.jpg"), caption="✨ Espaço Profundo - Viagem Interestelar até Tau Ceti", use_container_width=True)
     st.markdown("""
         <div class='cosmic-card' style='border-left: 5px solid #ffd166;'>
             <h2 style='color: #ffd166;'>✨ Operação Hail Mary: O Encontro com Rocky</h2>
@@ -237,7 +247,7 @@ def render_hail_mary_mission(user: dict):
 # MISSÃO 3: INTERESTELAR (GARGANTUA)
 # ----------------------------------------------------------------------
 def render_interstellar_mission(user: dict):
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Black_hole_-_Messier_87_crop_max_res.jpg/800px-Black_hole_-_Messier_87_crop_max_res.jpg", caption="🕳️ Horizonte de Eventos do Buraco Negro Supermassivo Gargantua", use_container_width=True)
+    st.image(get_img("blackhole.jpg"), caption="🕳️ Horizonte de Eventos do Buraco Negro Supermassivo Gargantua", use_container_width=True)
     st.markdown("""
         <div class='cosmic-card' style='border-left: 5px solid #7209b7;'>
             <h2 style='color: #7209b7;'>⏳ Operação Gargantua: A Gravidade que Dobra o Tempo</h2>

@@ -4,6 +4,7 @@ Atlas Celeste com Imagens Reais da NASA/Wikimedia, Balança Planetária,
 Calculadora de Viagem Espacial e Galeria de Imagens em Alta Resolução do James Webb & Hubble.
 """
 
+import os
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
@@ -11,11 +12,20 @@ import pandas as pd
 import requests
 from database import add_xp, unlock_badge
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+IMG_DIR = os.path.join(BASE_DIR, "assets", "images")
+
+def get_img(filename: str) -> str:
+    local_p = os.path.join(IMG_DIR, filename)
+    if os.path.exists(local_p):
+        return local_p
+    return filename
+
 CELESTIAL_BODIES = {
     "Sol": {
         "type": "Estrela (Anã Amarela)",
         "icon": "☀️",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg/800px-The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg",
+        "image_url": get_img("sun.jpg"),
         "diameter_km": 1392700,
         "gravity_ms2": 274.0,
         "gravity_ratio": 27.9,
@@ -28,7 +38,7 @@ CELESTIAL_BODIES = {
     "Mercúrio": {
         "type": "Planeta Rochoso",
         "icon": "🪨",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Mercury_in_color_-_Prockter07-edit1.jpg/800px-Mercury_in_color_-_Prockter07-edit1.jpg",
+        "image_url": get_img("mercury.jpg"),
         "diameter_km": 4879,
         "gravity_ms2": 3.7,
         "gravity_ratio": 0.38,
@@ -41,7 +51,7 @@ CELESTIAL_BODIES = {
     "Vênus": {
         "type": "Planeta Rochoso",
         "icon": "🟡",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Venus-real_color.jpg/800px-Venus-real_color.jpg",
+        "image_url": get_img("venus.jpg"),
         "diameter_km": 12104,
         "gravity_ms2": 8.87,
         "gravity_ratio": 0.90,
@@ -54,7 +64,7 @@ CELESTIAL_BODIES = {
     "Terra": {
         "type": "Planeta Rochoso (Nosso Lar)",
         "icon": "🌍",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/800px-The_Earth_seen_from_Apollo_17.jpg",
+        "image_url": get_img("earth.jpg"),
         "diameter_km": 12742,
         "gravity_ms2": 9.81,
         "gravity_ratio": 1.0,
@@ -67,7 +77,7 @@ CELESTIAL_BODIES = {
     "Lua": {
         "type": "Satélite Natural",
         "icon": "🌕",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/800px-FullMoon2010.jpg",
+        "image_url": get_img("moon.jpg"),
         "diameter_km": 3474,
         "gravity_ms2": 1.62,
         "gravity_ratio": 0.165,
@@ -80,7 +90,7 @@ CELESTIAL_BODIES = {
     "Marte": {
         "type": "Planeta Rochoso (Planeta Vermelho)",
         "icon": "🔴",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/800px-OSIRIS_Mars_true_color.jpg",
+        "image_url": get_img("mars.jpg"),
         "diameter_km": 6779,
         "gravity_ms2": 3.72,
         "gravity_ratio": 0.38,
@@ -93,7 +103,7 @@ CELESTIAL_BODIES = {
     "Júpiter": {
         "type": "Gigante Gasoso",
         "icon": "🪐",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg/800px-Jupiter_and_its_shrunken_Great_Red_Spot.jpg",
+        "image_url": get_img("jupiter.jpg"),
         "diameter_km": 139820,
         "gravity_ms2": 24.79,
         "gravity_ratio": 2.53,
@@ -106,7 +116,7 @@ CELESTIAL_BODIES = {
     "Europa (Lua de Júpiter)": {
         "type": "Lua Oceânica Gelada",
         "icon": "🧊",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Europa-moon-spacecraft-crop.jpg/800px-Europa-moon-spacecraft-crop.jpg",
+        "image_url": get_img("europa.jpg"),
         "diameter_km": 3121,
         "gravity_ms2": 1.31,
         "gravity_ratio": 0.134,
@@ -119,7 +129,7 @@ CELESTIAL_BODIES = {
     "Saturno": {
         "type": "Gigante Gasoso com Anéis",
         "icon": "🪐",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Saturn_during_Equinox.jpg/800px-Saturn_during_Equinox.jpg",
+        "image_url": get_img("saturn.jpg"),
         "diameter_km": 116460,
         "gravity_ms2": 10.44,
         "gravity_ratio": 1.06,
@@ -132,7 +142,7 @@ CELESTIAL_BODIES = {
     "Titã (Lua de Saturno)": {
         "type": "Lua com Atmosfera Densa",
         "icon": "🌫️",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Titan_in_true_color.jpg/800px-Titan_in_true_color.jpg",
+        "image_url": get_img("titan.jpg"),
         "diameter_km": 5149,
         "gravity_ms2": 1.35,
         "gravity_ratio": 0.138,
@@ -145,7 +155,7 @@ CELESTIAL_BODIES = {
     "Urano": {
         "type": "Gigante de Gelo",
         "icon": "🌀",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Uranus2.jpg/800px-Uranus2.jpg",
+        "image_url": get_img("uranus.jpg"),
         "diameter_km": 50724,
         "gravity_ms2": 8.69,
         "gravity_ratio": 0.89,
@@ -158,7 +168,7 @@ CELESTIAL_BODIES = {
     "Netuno": {
         "type": "Gigante de Gelo (Planeta dos Ventos)",
         "icon": "💨",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Neptune_Full.jpg/800px-Neptune_Full.jpg",
+        "image_url": get_img("neptune.jpg"),
         "diameter_km": 49244,
         "gravity_ms2": 11.15,
         "gravity_ratio": 1.14,
@@ -171,7 +181,7 @@ CELESTIAL_BODIES = {
     "Plutão": {
         "type": "Planeta Anão do Cinturão de Kuiper",
         "icon": "❄️",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Pluto_in_True_Color_-_High-Res.jpg/800px-Pluto_in_True_Color_-_High-Res.jpg",
+        "image_url": get_img("pluto.jpg"),
         "diameter_km": 2376,
         "gravity_ms2": 0.62,
         "gravity_ratio": 0.063,
@@ -184,7 +194,7 @@ CELESTIAL_BODIES = {
     "Gargantua (Buraco Negro)": {
         "type": "Buraco Negro Supermassivo (Sci-Fi / Astrofísica)",
         "icon": "🕳️",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Black_hole_-_Messier_87_crop_max_res.jpg/800px-Black_hole_-_Messier_87_crop_max_res.jpg",
+        "image_url": get_img("blackhole.jpg"),
         "diameter_km": 300000000,
         "gravity_ms2": 99999.0,
         "gravity_ratio": 10000.0,
@@ -221,37 +231,37 @@ JWST_HUBBLE_GALLERY = [
     {
         "title": "Pilares da Criação (Telescópio James Webb)",
         "telescope": "JWST (Infravermelho Próximo / NIRCam)",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Pillars_of_creation_2014_HST_WFC3-UVIS_full-res_denoised.jpg/800px-Pillars_of_creation_2014_HST_WFC3-UVIS_full-res_denoised.jpg",
+        "image_url": get_img("pillars.jpg"),
         "description": "Colunas majestosas de poeira cósmica e gás hidrogênio na Nebulosa da Águia (a 6.500 anos-luz de nós), onde novas estrelas estão se acendendo agora!"
     },
     {
         "title": "Primeiro Registro Real de um Buraco Negro (M87*)",
         "telescope": "Event Horizon Telescope (EHT)",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Black_hole_-_Messier_87_crop_max_res.jpg/800px-Black_hole_-_Messier_87_crop_max_res.jpg",
+        "image_url": get_img("blackhole_gallery.jpg"),
         "description": "A histórica primeira foto direta da sombra do horizonte de eventos de um buraco negro supermassivo no centro da galáxia Messier 87 (a 55 milhões de anos-luz)."
     },
     {
         "title": "Galáxia de Andrômeda (M31)",
         "telescope": "Observatórios Espaciais & Terrestres",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Andromeda_Galaxy_%28with_h-alpha%29.jpg/800px-Andromeda_Galaxy_%28with_h-alpha%29.jpg",
+        "image_url": get_img("andromeda.jpg"),
         "description": "A galáxia espiral gigante mais próxima da nossa Via Láctea, contendo mais de 1 trilhão de estrelas a 2,5 milhões de anos-luz de distância."
     },
     {
         "title": "A Terra Vista da Apollo 17 (The Blue Marble)",
         "telescope": "Missão Apollo 17 da NASA (1972)",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/800px-The_Earth_seen_from_Apollo_17.jpg",
+        "image_url": get_img("earth_apollo.jpg"),
         "description": "A fotografia mais icônica de nosso lar no Cosmos: um oásis azul e branco flutuando no vácuo escuro do espaço."
     },
     {
         "title": "O Planeta Marte em Alta Resolução (Sonda OSIRIS)",
         "telescope": "Sonda Espacial Rosetta / OSIRIS",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/800px-OSIRIS_Mars_true_color.jpg",
+        "image_url": get_img("mars_gallery.jpg"),
         "description": "O Planeta Vermelho em cores reais: suas calotas polares de gelo seco e crateras gigantescas que outrora abrigaram rios e lagos de água líquida."
     },
     {
         "title": "Júpiter e a Grande Mancha Vermelha",
         "telescope": "Telescópio Espacial Hubble (NASA/ESA)",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg/800px-Jupiter_and_its_shrunken_Great_Red_Spot.jpg",
+        "image_url": get_img("jupiter_gallery.jpg"),
         "description": "O rei dos planetas com suas faixas de nuvens turbulentas de amônia e a tempestade anticiclônica que ruge há centenas de anos."
     }
 ]
