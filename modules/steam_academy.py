@@ -1005,6 +1005,22 @@ def _render_tech_track(user: dict):
                 st.success(f"🤖 **Missão Bem-Sucedida!** O robô desviou dos perigos e avançou {10 + loop_times} metros no solo marciano com segurança!")
             else:
                 st.warning("⚠️ Cuidado: Sem o sensor de desvio de crateras ativado, o rover corre perigo no terreno acidentado!")
+
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, rgba(255,107,107,0.15), rgba(78,205,196,0.15)); border: 1px solid #ff6b6b; border-radius: 10px; padding: 14px; margin: 15px 0;'>
+                <h4 style='color: #ff6b6b; margin: 0 0 5px 0;'>🚀 Quer pilotar o Rover em 2D com Grid Interativo em Tempo Real?</h4>
+                <p style='color: #e2e8f0; font-size: 0.95rem; margin: 0 0 10px 0;'>
+                    Experimente o <strong>Simulador Visual Completo do Rover</strong> no Laboratório STEAM: veja o robô se movimentar no mapa marciano passo a passo, desviar de crateras, disparar o laser SuperCam e coletar amostras com 4 níveis de desafios!
+                </p>
+            </div>
+        """, unsafe_allow_html=True)
+        if st.button("🎮 Abrir Simulador Visual 2D do Rover", key="btn_jump_rover_sim"):
+            st.session_state.redirect_target = {
+                "area": "🔬 Laboratório STEAM",
+                "module_key": "nav_steam_lab",
+                "module_val": "🔬 Laboratório STEAM"
+            }
+            st.rerun()
                 
         # ETAPA 4: TESTES
         st.markdown("### 📝 ETAPA 4: Testes de Fixação")

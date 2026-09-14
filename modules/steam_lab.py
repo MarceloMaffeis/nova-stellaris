@@ -80,56 +80,11 @@ def render_steam_lab(user: dict):
             st.success("🎉 **Conquista Desbloqueada:** 🧪 Alquimista das Estrelas! (+120 XP)")
 
     # ----------------------------------------------------
-    # 2. COMPUTAÇÃO: TERMINAL DO ROVER
+    # 2. COMPUTAÇÃO: TERMINAL DO ROVER VISUAL
     # ----------------------------------------------------
     with pillar[1]:
-        st.subheader("💻 Mini-IDE: Programação Autônoma do Rover Marciano")
-        st.markdown("""
-            O sinal de rádio da Terra leva até 20 minutos para chegar a Marte.
-            Por isso, os engenheiros da NASA precisam **programar uma sequência de algoritmos** para o Rover executar sozinho!
-            
-            🎯 **Missão:** Leve o Rover da posição de pouso **(0, 0)** até a Rocha com Fóssil na posição **(2, 2)** e acione o Laser!
-        """)
-        
-        st.markdown("##### 📜 Digite seu código de instruções (um comando por linha):")
-        code_input = st.text_area(
-            "Editor de Algoritmo:",
-            value="avancar()\navancar()\nvirar_direita()\navancar()\navancar()\nusar_laser()",
-            height=140
-        )
-        
-        if st.button("Executar Algoritmo no Rover 🤖"):
-            lines = [line.strip().lower() for line in code_input.strip().split("\n") if line.strip()]
-            
-            # Simulação do Rover
-            x, y = 0, 0
-            direction = 0  # 0: Leste (X+), 1: Sul (Y-), 2: Oeste (X-), 3: Norte (Y+)
-            used_laser = False
-            
-            for cmd in lines:
-                if cmd == "avancar()":
-                    if direction == 0: x += 1
-                    elif direction == 1: y -= 1
-                    elif direction == 2: x -= 1
-                    elif direction == 3: y += 1
-                elif cmd == "virar_direita()":
-                    direction = (direction + 1) % 4
-                elif cmd == "virar_esquerda()":
-                    direction = (direction - 1) % 4
-                elif cmd == "usar_laser()":
-                    if x == 2 and (y == 2 or y == -2):
-                        used_laser = True
-                        
-            st.markdown(f"**Posição Final do Rover:** `X = {x}, Y = {abs(y)}`")
-            
-            if x == 2 and abs(y) == 2 and used_laser:
-                st.success("🎉 **SUCESSO NA MISSÃO!** O Rover navegou pelo labirinto de crateras e o laser SuperCam vaporizou a rocha, descobrindo minerais antigos!")
-                if unlock_badge(user["id"], "rover_commander"):
-                    add_xp(user["id"], 150)
-                    st.balloons()
-                    st.success("🎉 **Conquista Desbloqueada:** 🤖 Comandante de Algoritmos! (+150 XP)")
-            else:
-                st.error("❌ O Rover não atingiu o alvo ou esqueceu de disparar `usar_laser()` na posição (2,2). Ajuste a sequência e tente novamente!")
+        from modules.rover_simulator import render_rover_simulator
+        render_rover_simulator(user)
 
     # ----------------------------------------------------
     # 3. MATEMÁTICA: POTÊNCIAS DE 10 & NOTAÇÃO CIENTÍFICA
