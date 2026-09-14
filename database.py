@@ -533,17 +533,25 @@ def get_user_stats(user_id: int) -> Dict[str, Any]:
     user_row = cursor.fetchone()
     cursor.execute("SELECT COUNT(*) as count FROM user_badges WHERE user_id = ?", (user_id,))
     badge_count = cursor.fetchone()["count"]
-    cursor.execute("SELECT COUNT(*) as count, SUM(is_correct) as correct FROM quiz_attempts WHERE user_id = ?", (user_id,))
+    cursor.execute("SELECT COUNT(*) as count, COALESCE(SUM(is_correct), 0) as correct FROM quiz_attempts WHERE user_id = ?", (user_id,))
     quiz_row = cursor.fetchone()
     cursor.execute("SELECT COUNT(*) as count FROM mission_progress WHERE user_id = ? AND completed = 1", (user_id,))
     missions_completed = cursor.fetchone()["count"]
     conn.close()
     
+    quiz_total = quiz_row["count"] or 0
+    quiz_correct = quiz_row["correct"] or 0
+    accuracy = round((quiz_correct / quiz_total * 100), 1) if quiz_total > 0 else 0.0
+    
     return {
         "user": dict(user_row) if user_row else {},
         "badges_count": badge_count,
-        "quiz_total": quiz_row["count"] or 0,
-        "quiz_correct": quiz_row["correct"] or 0,
+        "quiz_total": quiz_total,
+        "quiz_correct": quiz_correct,
+        "quizzes_played": quiz_total,
+        "quizzes_correct": quiz_correct,
+        "quiz_accuracy": accuracy,
+        "accuracy": accuracy,
         "missions_completed": missions_completed
     }
 

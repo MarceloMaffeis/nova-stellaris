@@ -1,4 +1,4 @@
-﻿"""
+"""
 Nova Stellaris - AstroQuiz STEAM & Gamificação
 Jogo de perguntas e respostas com XP, níveis e feedback pedagógico imediato.
 """
@@ -18,16 +18,21 @@ def render_quiz_game(user: dict):
     
     stats = get_user_stats(user["id"])
     
+    q_played = stats.get("quizzes_played", stats.get("quiz_total", 0))
+    q_correct = stats.get("quizzes_correct", stats.get("quiz_correct", 0))
+    q_acc = stats.get("quiz_accuracy", stats.get("accuracy", 0.0))
+    b_count = stats.get("badges_count", 0)
+    
     # Placar rápido
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        st.markdown(f"<div class='cosmic-card' style='text-align:center;'><h4>Total Jogadas</h4><h2 style='color:#00d4ff;'>{stats['quizzes_played']}</h2></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='cosmic-card' style='text-align:center;'><h4>Total Jogadas</h4><h2 style='color:#00d4ff;'>{q_played}</h2></div>", unsafe_allow_html=True)
     with c2:
-        st.markdown(f"<div class='cosmic-card' style='text-align:center;'><h4>Acertos</h4><h2 style='color:#06d6a0;'>{stats['quizzes_correct']}</h2></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='cosmic-card' style='text-align:center;'><h4>Acertos</h4><h2 style='color:#06d6a0;'>{q_correct}</h2></div>", unsafe_allow_html=True)
     with c3:
-        st.markdown(f"<div class='cosmic-card' style='text-align:center;'><h4>Precisão</h4><h2 style='color:#ffd166;'>{stats['quiz_accuracy']}%</h2></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='cosmic-card' style='text-align:center;'><h4>Precisão</h4><h2 style='color:#ffd166;'>{q_acc}%</h2></div>", unsafe_allow_html=True)
     with c4:
-        st.markdown(f"<div class='cosmic-card' style='text-align:center;'><h4>Conquistas</h4><h2 style='color:#f72585;'>{stats['badges_count']}</h2></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='cosmic-card' style='text-align:center;'><h4>Conquistas</h4><h2 style='color:#f72585;'>{b_count}</h2></div>", unsafe_allow_html=True)
         
     st.markdown("---")
     
@@ -90,13 +95,14 @@ def render_quiz_game(user: dict):
                 
                 # Checar badges
                 new_stats = get_user_stats(user["id"])
-                if new_stats["quizzes_correct"] >= 5:
+                new_correct = new_stats.get("quizzes_correct", new_stats.get("quiz_correct", 0))
+                if new_correct >= 5:
                     if unlock_badge(user["id"], "quiz_cadet"):
                         add_xp(user["id"], 100)
                         st.balloons()
                         st.success("🎉 **Conquista Desbloqueada:** ⭐ Cadete da Sabedoria! (+100 XP)")
                         
-                if new_stats["quizzes_correct"] >= 10:
+                if new_correct >= 10:
                     if unlock_badge(user["id"], "quiz_master"):
                         add_xp(user["id"], 250)
                         st.balloons()
