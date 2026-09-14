@@ -38,7 +38,7 @@ init_db()
 
 # Carregar CSS
 def load_css():
-    css_path = os.path.join(os.path.dirname(__file__), "assets", "styles.css")
+    css_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "styles.css")
     if os.path.exists(css_path):
         with open(css_path, "r", encoding="utf-8") as f:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -66,6 +66,15 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if "current_user" not in st.session_state:
     st.session_state.current_user = None
+
+# Tratar Redirecionamento Seguro antes de instanciar os widgets da barra lateral
+if "redirect_target" in st.session_state and st.session_state.redirect_target:
+    target = st.session_state.redirect_target
+    if "area" in target:
+        st.session_state.nav_area_selector = target["area"]
+    if "module_key" in target and "module_val" in target:
+        st.session_state[target["module_key"]] = target["module_val"]
+    st.session_state.redirect_target = None
 
 if not st.session_state.authenticated or not st.session_state.current_user:
     render_auth_page()
@@ -155,6 +164,10 @@ else:
             "🤖 4. MENTORIA IA & CONQUISTAS"
         ]
         
+        # Garantir valor padrão se a chave ainda não estiver inicializada
+        if "nav_area_selector" not in st.session_state:
+            st.session_state.nav_area_selector = area_options[0]
+            
         area_choice = st.selectbox(
             "Selecione a Área da Estação:",
             area_options,
@@ -264,4 +277,3 @@ else:
                         </p>
                     </div>
                 """, unsafe_allow_html=True)
-

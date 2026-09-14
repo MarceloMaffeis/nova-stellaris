@@ -64,8 +64,11 @@ def render_student_portal(user: dict):
             </div>
         """, unsafe_allow_html=True)
         if st.button("Entrar em Matemática 📐", use_container_width=True, key="btn_portal_math"):
-            st.session_state.nav_area_selector = "🎓 1. ACADEMIA NOVA STELLARIS (Fundamentos & Trilhas)"
-            st.session_state.nav_mod_academy = "🎓 Academia Nova Stellaris (Fundamentos & Trilhas)"
+            st.session_state.redirect_target = {
+                "area": "🎓 1. ACADEMIA NOVA STELLARIS (Fundamentos & Trilhas)",
+                "module_key": "nav_mod_academy",
+                "module_val": "🎓 Academia Nova Stellaris (Fundamentos & Trilhas)"
+            }
             st.rerun()
             
     # Card 2: Física
@@ -78,8 +81,11 @@ def render_student_portal(user: dict):
             </div>
         """, unsafe_allow_html=True)
         if st.button("Entrar em Física ⚡", use_container_width=True, key="btn_portal_phys"):
-            st.session_state.nav_area_selector = "🎓 1. ACADEMIA NOVA STELLARIS (Fundamentos & Trilhas)"
-            st.session_state.nav_mod_academy = "🎓 Academia Nova Stellaris (Fundamentos & Trilhas)"
+            st.session_state.redirect_target = {
+                "area": "🎓 1. ACADEMIA NOVA STELLARIS (Fundamentos & Trilhas)",
+                "module_key": "nav_mod_academy",
+                "module_val": "🎓 Academia Nova Stellaris (Fundamentos & Trilhas)"
+            }
             st.rerun()
 
     # Card 3: Química
@@ -92,8 +98,11 @@ def render_student_portal(user: dict):
             </div>
         """, unsafe_allow_html=True)
         if st.button("Entrar em Química 🧪", use_container_width=True, key="btn_portal_chem"):
-            st.session_state.nav_area_selector = "🎓 1. ACADEMIA NOVA STELLARIS (Fundamentos & Trilhas)"
-            st.session_state.nav_mod_academy = "🎓 Academia Nova Stellaris (Fundamentos & Trilhas)"
+            st.session_state.redirect_target = {
+                "area": "🎓 1. ACADEMIA NOVA STELLARIS (Fundamentos & Trilhas)",
+                "module_key": "nav_mod_academy",
+                "module_val": "🎓 Academia Nova Stellaris (Fundamentos & Trilhas)"
+            }
             st.rerun()
 
     st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
@@ -109,8 +118,11 @@ def render_student_portal(user: dict):
             </div>
         """, unsafe_allow_html=True)
         if st.button("Entrar em Tecnologia 💻", use_container_width=True, key="btn_portal_tech"):
-            st.session_state.nav_area_selector = "🎓 1. ACADEMIA NOVA STELLARIS (Fundamentos & Trilhas)"
-            st.session_state.nav_mod_academy = "🎓 Academia Nova Stellaris (Fundamentos & Trilhas)"
+            st.session_state.redirect_target = {
+                "area": "🎓 1. ACADEMIA NOVA STELLARIS (Fundamentos & Trilhas)",
+                "module_key": "nav_mod_academy",
+                "module_val": "🎓 Academia Nova Stellaris (Fundamentos & Trilhas)"
+            }
             st.rerun()
 
     # Card 5: Observatório
@@ -123,8 +135,11 @@ def render_student_portal(user: dict):
             </div>
         """, unsafe_allow_html=True)
         if st.button("Abrir Observatório 🌌", use_container_width=True, key="btn_portal_obs"):
-            st.session_state.nav_area_selector = "🔭 2. EXPLORAÇÃO & CIÊNCIA"
-            st.session_state.nav_mod_exploration = "🌌 Observatório do Cosmos"
+            st.session_state.redirect_target = {
+                "area": "🔭 2. EXPLORAÇÃO & CIÊNCIA",
+                "module_key": "nav_mod_exploration",
+                "module_val": "🌌 Observatório do Cosmos"
+            }
             st.rerun()
 
     # Card 6: Missões Sci-Fi
@@ -137,8 +152,11 @@ def render_student_portal(user: dict):
             </div>
         """, unsafe_allow_html=True)
         if st.button("Iniciar Missões 🚀", use_container_width=True, key="btn_portal_scifi"):
-            st.session_state.nav_area_selector = "🔭 2. EXPLORAÇÃO & CIÊNCIA"
-            st.session_state.nav_mod_exploration = "🚀 Missões Sci-Fi Interativas"
+            st.session_state.redirect_target = {
+                "area": "🔭 2. EXPLORAÇÃO & CIÊNCIA",
+                "module_key": "nav_mod_exploration",
+                "module_val": "🚀 Missões Sci-Fi Interativas"
+            }
             st.rerun()
 
     st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
@@ -154,8 +172,11 @@ def render_student_portal(user: dict):
             </div>
         """, unsafe_allow_html=True)
         if st.button("Jogar no Arcade 🎮", use_container_width=True, key="btn_portal_arcade"):
-            st.session_state.nav_area_selector = "🕹️ 3. ARCADE CÓSMICO & JOGOS"
-            st.session_state.nav_mod_arcade = "🕹️ Arcade Cósmico (3 Jogos Sci-Fi)"
+            st.session_state.redirect_target = {
+                "area": "🕹️ 3. ARCADE CÓSMICO & JOGOS",
+                "module_key": "nav_mod_arcade",
+                "module_val": "🕹️ Arcade Cósmico (3 Jogos Sci-Fi)"
+            }
             st.rerun()
 
     # Card 8: Biblioteca Cósmica
@@ -168,8 +189,11 @@ def render_student_portal(user: dict):
             </div>
         """, unsafe_allow_html=True)
         if st.button("Pesquisar na Biblioteca 📚", use_container_width=True, key="btn_portal_library"):
-            st.session_state.nav_area_selector = "🤖 4. MENTORIA IA & CONQUISTAS"
-            st.session_state.nav_mod_mentor = "📚 Hub de Conhecimento"
+            st.session_state.redirect_target = {
+                "area": "🤖 4. MENTORIA IA & CONQUISTAS",
+                "module_key": "nav_mod_mentor",
+                "module_val": "📚 Hub de Conhecimento"
+            }
             st.rerun()
 
     # Card 9: CosmoAI
@@ -182,6 +206,9 @@ def render_student_portal(user: dict):
             </div>
         """, unsafe_allow_html=True)
         if st.button("Conversar com CosmoAI 🤖", use_container_width=True, key="btn_portal_ai"):
-            st.session_state.nav_area_selector = "🤖 4. MENTORIA IA & CONQUISTAS"
-            st.session_state.nav_mod_mentor = "🤖 CosmoAI (Mentor Espacial)"
+            st.session_state.redirect_target = {
+                "area": "🤖 4. MENTORIA IA & CONQUISTAS",
+                "module_key": "nav_mod_mentor",
+                "module_val": "🤖 CosmoAI (Mentor Espacial)"
+            }
             st.rerun()
