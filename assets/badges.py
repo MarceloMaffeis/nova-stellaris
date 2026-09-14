@@ -111,6 +111,33 @@ BADGES = {
         "description": "Visitou os simuladores 3D e canais educativos no Hub de Conhecimento!",
         "xp_reward": 80,
         "color": "#3a86ff"
+    },
+    "astro_farmer": {
+        "id": "astro_farmer",
+        "title": "Agricultor do Domo Marciano",
+        "category": "Astro-Valley",
+        "icon": "🌾",
+        "description": "Cultivou e colheu 10 safras de batatas e vegetais espaciais no Astro-Valley!",
+        "xp_reward": 150,
+        "color": "#4ade80"
+    },
+    "energy_pioneer": {
+        "id": "energy_pioneer",
+        "title": "Pioneiro da Energia Solar",
+        "category": "Astro-Valley",
+        "icon": "⚡",
+        "description": "Manteve a rede de painéis solares e baterias marcianas com 100% de eficiência!",
+        "xp_reward": 150,
+        "color": "#fbbf24"
+    },
+    "sol_survivor": {
+        "id": "sol_survivor",
+        "title": "Sobrevivente dos Sols",
+        "category": "Astro-Valley",
+        "icon": "🪐",
+        "description": "Sobreviveu a mais de 10 Sols no simulador gerenciando oxigênio, água e biomassa!",
+        "xp_reward": 200,
+        "color": "#f97316"
     }
 }
 

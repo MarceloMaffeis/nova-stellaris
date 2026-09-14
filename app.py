@@ -1,4 +1,4 @@
-﻿"""
+"""
 Nova Stellaris - Plataforma Interativa de Aprendizado Espacial STEAM
 Ponto de entrada principal da aplicação Streamlit.
 """
@@ -32,6 +32,7 @@ from assets.badges import BADGES, get_rank_for_xp
 from modules.observatory import render_observatory
 from modules.sci_fi_missions import render_sci_fi_missions
 from modules.steam_lab import render_steam_lab
+from modules.astro_valley_web import render_astro_valley
 from modules.cosmo_ai import render_cosmo_ai
 from modules.quiz_game import render_quiz_game
 from modules.knowledge_hub import render_knowledge_hub
@@ -102,6 +103,7 @@ with st.sidebar:
             "🌌 Observatório do Cosmos",
             "🚀 Missões Sci-Fi Interativas",
             "🧮 Laboratório Integrado STEAM",
+            "🌾 Astro-Valley (Domo Marciano)",
             "🤖 CosmoAI (Mentor Espacial)",
             "🎮 AstroQuiz & Desafios",
             "📚 Hub de Conhecimento",
@@ -130,6 +132,8 @@ elif nav_option == "🚀 Missões Sci-Fi Interativas":
     render_sci_fi_missions(user)
 elif nav_option == "🧮 Laboratório Integrado STEAM":
     render_steam_lab(user)
+elif nav_option == "🌾 Astro-Valley (Domo Marciano)":
+    render_astro_valley(user)
 elif nav_option == "🤖 CosmoAI (Mentor Espacial)":
     render_cosmo_ai(user)
 elif nav_option == "🎮 AstroQuiz & Desafios":

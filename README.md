@@ -1,4 +1,4 @@
-﻿# 🚀 Nova Stellaris — Universo Interativo STEAM
+# 🚀 Nova Stellaris — Universo Interativo STEAM
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.35%2B-FF4B4B.svg?logo=streamlit&logoColor=white)](https://streamlit.io)
@@ -31,15 +31,19 @@ Inspirado em clássicos modernos da ficção científica rigorosa como ***Devora
 - 🧮 **Matemática Espacial:** Mago da Notação Científica ($10^x$), potências de 10 e cálculo de volumes planetários ($V = \frac{4}{3}\pi r^3$).
 - 🌌 **Física Orbital:** As 3 Leis de Kepler e o Canhão de Newton para entender velocidades de escape e satélites.
 
-### 4. 🤖 CosmoAI — O Mentor Espacial
+### 4. 🌾 Astro-Valley — Simulador do Domo Marciano (Stardew Valley Espacial)
+- **Versão Web Integrada (HTML5 Canvas + JS):** Cultive batatas marcianas, limpe painéis solares para recuperar 100% de eficiência energética, sintetize água no reator químico ($2H_2 + O_2 \to 2H_2O$), minere nos tubos de lava subterrâneos e sobreviva aos ciclos de dia/noite (Sols) diretamente no navegador!
+- **Versão Desktop 2D (Pygame):** Jogo completo a 60 FPS com controles fluidos, arte pixel-art procedural, áudio sintetizado 8-bit em tempo real, terminal de perguntas científicas e sincronização de XP direto com o banco SQLite. Inicie com um clique em `run_astro_valley.bat`!
+
+### 5. 🤖 CosmoAI — O Mentor Espacial
 - Chatbot inteligente com a **Google Gemini API** adotando a persona de um astrofísico empolgante, pronto para responder dúvidas, propor desafios e contar curiosidades com analogias claras.
 - Gerador de enigmas espaciais em tempo real com dicas e soluções explicadas.
 
-### 5. 🎮 AstroQuiz STEAM & Gamificação
+### 6. 🎮 AstroQuiz STEAM & Gamificação
 - Dezenas de desafios categorizados por área (Física, Matemática, Química, Computação) e nível (Cadete, Cientista, Mestre).
 - Sistema de **XP, Níveis (de Observador a Mestre Astrofísico Lendário)** e **Galeria de Insígnias Desbloqueáveis** salvas no banco de dados local SQLite.
 
-### 6. 📚 Hub de Conhecimento
+### 7. 📚 Hub de Conhecimento
 - Diretório curado de simuladores 3D online (NASA Eyes, Stellarium 3D, PhET Colorado), canais recomendados do YouTube (Space Today, Ciência Todo Dia, Kurzgesagt Brasil, Manual do Mundo) e guia de obras de ficção científica comentadas.
 
 ---
