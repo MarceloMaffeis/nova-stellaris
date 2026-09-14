@@ -1,4 +1,4 @@
-﻿"""
+"""
 Nova Stellaris - Sistema de Conquistas e Medalhas STEAM
 Define todas as insígnias desbloqueáveis para o aluno.
 """
@@ -156,6 +156,51 @@ BADGES = {
         "description": "Completou a manobra de estilingue gravitacional e cruzou o Wormhole em Interestelar!",
         "xp_reward": 200,
         "color": "#c084fc"
+    },
+    "steam_math_master": {
+        "id": "steam_math_master",
+        "title": "Mestre da Matemática Espacial",
+        "category": "Academia STEAM",
+        "icon": "📐",
+        "description": "Dominou escalas cósmicas, notação científica e leis orbitais de Kepler na Academia!",
+        "xp_reward": 180,
+        "color": "#38bdf8"
+    },
+    "steam_phys_master": {
+        "id": "steam_phys_master",
+        "title": "Físico Cósmico de Vanguarda",
+        "category": "Academia STEAM",
+        "icon": "⚛️",
+        "description": "Dominou gravitação universal, propulsão de foguetes e dilatação temporal relativística!",
+        "xp_reward": 180,
+        "color": "#a855f7"
+    },
+    "steam_chem_master": {
+        "id": "steam_chem_master",
+        "title": "Alquimista do Cosmos",
+        "category": "Academia STEAM",
+        "icon": "🧪",
+        "description": "Dominou a forja de elementos estelares, síntese de compostos em Marte e espectroscopia!",
+        "xp_reward": 180,
+        "color": "#34d399"
+    },
+    "steam_tech_master": {
+        "id": "steam_tech_master",
+        "title": "Engenheiro de Telecom & IA",
+        "category": "Academia STEAM",
+        "icon": "💻",
+        "description": "Dominou algoritmos de sondas, sinais binários da Deep Space Network e IA astronômica!",
+        "xp_reward": 180,
+        "color": "#fbbf24"
+    },
+    "steam_polymath": {
+        "id": "steam_polymath",
+        "title": "Polímata das Galáxias",
+        "category": "Academia STEAM",
+        "icon": "👑",
+        "description": "Conquistou excelência em todos os níveis das 4 disciplinas da Academia STEAM!",
+        "xp_reward": 300,
+        "color": "#f43f5e"
     }
 }
 

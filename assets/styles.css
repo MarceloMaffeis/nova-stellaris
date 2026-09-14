@@ -1,4 +1,4 @@
-﻿/* Nova Stellaris - Tema Cósmico Glassmorphism */
+/* Nova Stellaris - Tema Cósmico Glassmorphism */
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -178,3 +178,82 @@ h1, h2, h3, .cosmic-title {
     color: #ffffff;
     margin-left: auto;
 }
+
+/* 🎓 ACADEMIA STEAM — CARTÕES DE NÍVEL & EXERCÍCIOS */
+.level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+.level-badge.cadet {
+    background: rgba(74, 222, 128, 0.2);
+    color: #4ade80;
+    border: 1px solid #22c55e;
+}
+.level-badge.explorer {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    border: 1px solid #f59e0b;
+}
+.level-badge.astrophysicist {
+    background: rgba(192, 132, 252, 0.2);
+    color: #c084fc;
+    border: 1px solid #a855f7;
+}
+
+.formula-box {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid #38bdf8;
+    border-left: 5px solid #00d4ff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 15px 0;
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.15);
+}
+
+.exercise-card {
+    background: rgba(19, 23, 43, 0.85);
+    border: 1px solid rgba(255, 209, 102, 0.35);
+    border-radius: 14px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+}
+
+.correct-box {
+    background: rgba(20, 83, 45, 0.7);
+    border: 1px solid #22c55e;
+    color: #bbf7d0;
+    padding: 12px 18px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.hint-box {
+    background: rgba(30, 41, 59, 0.8);
+    border-left: 3px solid #fbbf24;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    margin-top: 8px;
+}
+
+.sidebar-category-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 14px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 4px;
+}
+

@@ -29,6 +29,7 @@ load_css()
 
 # Importar Módulos
 from assets.badges import BADGES, get_rank_for_xp
+from modules.steam_academy import render_steam_academy
 from modules.observatory import render_observatory
 from modules.sci_fi_missions import render_sci_fi_missions
 from modules.steam_lab import render_steam_lab
@@ -95,22 +96,57 @@ with st.sidebar:
         </div>
     """, unsafe_allow_html=True)
     
-    # Menu de Navegação
-    st.markdown("### 🧭 Painel de Controle")
-    nav_option = st.radio(
-        "Selecione o Módulo:",
+    # Menu de Navegação Dividido por Áreas
+    st.markdown("### 🧭 Divisões & Módulos")
+    
+    area_choice = st.selectbox(
+        "Selecione a Área da Estação:",
         [
-            "🌌 Observatório do Cosmos",
-            "🚀 Missões Sci-Fi Interativas",
-            "🧮 Laboratório Integrado STEAM",
-            "🕹️ Arcade Cósmico (3 Jogos Sci-Fi)",
-            "🤖 CosmoAI (Mentor Espacial)",
-            "🎮 AstroQuiz & Desafios",
-            "📚 Hub de Conhecimento",
-            "🏆 Minhas Insígnias & Conquistas"
+            "🎓 1. ACADEMIA STEAM (Trilhas & Lab)",
+            "🔭 2. EXPLORAÇÃO & CIÊNCIA",
+            "🕹️ 3. ARCADE CÓSMICO & JOGOS",
+            "🤖 4. MENTORIA IA & CONQUISTAS"
         ],
-        label_visibility="collapsed"
+        key="nav_area_selector"
     )
+    
+    if "1. ACADEMIA" in area_choice:
+        nav_option = st.radio(
+            "Módulo de Aprendizado:",
+            [
+                "🎓 Academia STEAM (Trilhas Graduadas)",
+                "🧮 Laboratório Integrado STEAM"
+            ],
+            key="nav_mod_academy"
+        )
+    elif "2. EXPLORAÇÃO" in area_choice:
+        nav_option = st.radio(
+            "Módulo Científico:",
+            [
+                "🌌 Observatório do Cosmos",
+                "🚀 Missões Sci-Fi Interativas"
+            ],
+            key="nav_mod_exploration"
+        )
+    elif "3. ARCADE" in area_choice:
+        nav_option = st.radio(
+            "Módulo de Jogos:",
+            [
+                "🕹️ Arcade Cósmico (3 Jogos Sci-Fi)",
+                "🎮 AstroQuiz & Desafios"
+            ],
+            key="nav_mod_arcade"
+        )
+    else:
+        nav_option = st.radio(
+            "Módulo de Apoio & Perfil:",
+            [
+                "🤖 CosmoAI (Mentor Espacial)",
+                "📚 Hub de Conhecimento",
+                "🏆 Minhas Insígnias & Conquistas"
+            ],
+            key="nav_mod_mentor"
+        )
     
     st.markdown("---")
     st.markdown("""
@@ -126,7 +162,9 @@ with st.sidebar:
 # Atualizar dados do usuário a cada render
 user = get_or_create_user(st.session_state.current_username, st.session_state.current_avatar)
 
-if nav_option == "🌌 Observatório do Cosmos":
+if nav_option == "🎓 Academia STEAM (Trilhas Graduadas)":
+    render_steam_academy(user)
+elif nav_option == "🌌 Observatório do Cosmos":
     render_observatory(user)
 elif nav_option == "🚀 Missões Sci-Fi Interativas":
     render_sci_fi_missions(user)
