@@ -138,6 +138,24 @@ BADGES = {
         "description": "Sobreviveu a mais de 10 Sols no simulador gerenciando oxigênio, água e biomassa!",
         "xp_reward": 200,
         "color": "#f97316"
+    },
+    "hail_mary_hero": {
+        "id": "hail_mary_hero",
+        "title": "Herói de Tau Ceti & Rocky",
+        "category": "Arcade",
+        "icon": "✨",
+        "description": "Coletou 10 espécimes de Taumeba e salvou o Sol no jogo Operação Hail Mary!",
+        "xp_reward": 200,
+        "color": "#ffd166"
+    },
+    "gargantua_slingshot": {
+        "id": "gargantua_slingshot",
+        "title": "Piloto de Gargantua",
+        "category": "Arcade",
+        "icon": "🕳️",
+        "description": "Completou a manobra de estilingue gravitacional e cruzou o Wormhole em Interestelar!",
+        "xp_reward": 200,
+        "color": "#c084fc"
     }
 }
 

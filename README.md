@@ -31,9 +31,10 @@ Inspirado em clássicos modernos da ficção científica rigorosa como ***Devora
 - 🧮 **Matemática Espacial:** Mago da Notação Científica ($10^x$), potências de 10 e cálculo de volumes planetários ($V = \frac{4}{3}\pi r^3$).
 - 🌌 **Física Orbital:** As 3 Leis de Kepler e o Canhão de Newton para entender velocidades de escape e satélites.
 
-### 4. 🌾 Astro-Valley — Simulador do Domo Marciano (Stardew Valley Espacial)
-- **Versão Web Integrada (HTML5 Canvas + JS):** Cultive batatas marcianas, limpe painéis solares para recuperar 100% de eficiência energética, sintetize água no reator químico ($2H_2 + O_2 \to 2H_2O$), minere nos tubos de lava subterrâneos e sobreviva aos ciclos de dia/noite (Sols) diretamente no navegador!
-- **Versão Desktop 2D (Pygame):** Jogo completo a 60 FPS com controles fluidos, arte pixel-art procedural, áudio sintetizado 8-bit em tempo real, terminal de perguntas científicas e sincronização de XP direto com o banco SQLite. Inicie com um clique em `run_astro_valley.bat`!
+### 4. 🕹️ Arcade Cósmico STEAM — Trilogia de Jogos Sci-Fi
+- 🌾 **Astro-Valley (Perdido em Marte):** Cultive batatas marcianas, limpe painéis solares para recuperar 100% de eficiência, sintetize água ($2H_2 + O_2 \to 2H_2O$), minere nos tubos de lava subterrâneos e sobreviva aos ciclos de Sols! *(Web no navegador ou Desktop em `run_astro_valley.bat`)*
+- ✨ **Operação Hail Mary (Devoradores de Estrelas):** Pilote a nave *Hail Mary* junto com a *Blip-A* de Rocky pelo sistema Tau Ceti, colete 10 Taumebas e ative o escudo sonoro harmônico de Rocky para vaporizar nuvens de Astrofagos! *(Web no navegador ou Desktop em `run_hail_mary.bat`)*
+- ⏳ **Manobra em Gargantua (Interestelar):** Pilote a nave *Ranger* pelas ondas colossais do Planeta Miller para resgatar balizas de dados e realize a manobra de estilingue gravitacional no disco de acreção do buraco negro Gargantua para cruzar o Wormhole! *(Web no navegador ou Desktop em `run_interstellar.bat`)*
 
 ### 5. 🤖 CosmoAI — O Mentor Espacial
 - Chatbot inteligente com a **Google Gemini API** adotando a persona de um astrofísico empolgante, pronto para responder dúvidas, propor desafios e contar curiosidades com analogias claras.
