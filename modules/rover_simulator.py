@@ -67,14 +67,12 @@ DIRECTIONS = ["➡️ Leste (X+)", "⬇️ Sul (Y-)", "⬅️ Oeste (X-)", "⬆�
 DIR_DELTAS = [(1, 0), (0, -1), (-1, 0), (0, 1)]
 
 def render_rover_simulator(user: dict):
-    st.markdown("""
-        <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(40,15,20,0.95), rgba(16,20,45,0.95)); border: 1px solid #ff6b6b;'>
-            <h1 style='color: #ff6b6b; margin-bottom: 5px;'>🤖 Simulador Visual de Trajetória do Rover em Marte</h1>
-            <p style='color: #cbd5e1; font-size: 1.1rem; margin: 0;'>
-                Programe os algoritmos de navegação autônoma do <strong>Rover Perseverance</strong> na Cratera Jezero com blocos visuais e veja ele se movimentar pelo solo marciano!
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(40,15,20,0.95), rgba(16,20,45,0.95)); border: 1px solid #ff6b6b;'>
+<h1 style='color: #ff6b6b; margin-bottom: 5px;'>🤖 Simulador Visual de Trajetória do Rover em Marte</h1>
+<p style='color: #cbd5e1; font-size: 1.1rem; margin: 0;'>
+Programe os algoritmos de navegação autônoma do <strong>Rover Perseverance</strong> na Cratera Jezero com blocos visuais e veja ele se movimentar pelo solo marciano!
+</p>
+</div>""", unsafe_allow_html=True)
     
     # ----------------------------------------------------------------------
     # SELEÇÃO DE MISSÃO / NÍVEL
@@ -87,13 +85,11 @@ def render_rover_simulator(user: dict):
     )
     mission = ROVER_MISSIONS[mission_id]
     
-    st.markdown(f"""
-        <div style='background: rgba(19, 23, 43, 0.75); border-left: 4px solid #ff6b6b; padding: 12px 18px; border-radius: 8px; margin: 12px 0;'>
-            <h4 style='color: #ff6b6b; margin: 0;'>{mission['title']}</h4>
-            <p style='color: #ffd166; font-size: 0.9rem; margin: 4px 0;'><strong>Objetivo:</strong> {mission['subtitle']}</p>
-            <p style='color: #e2e8f0; font-size: 0.9rem; margin: 0;'>{mission['description']}</p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f"""<div style='background: rgba(19, 23, 43, 0.75); border-left: 4px solid #ff6b6b; padding: 12px 18px; border-radius: 8px; margin: 12px 0;'>
+<h4 style='color: #ff6b6b; margin: 0;'>{mission['title']}</h4>
+<p style='color: #ffd166; font-size: 0.9rem; margin: 4px 0;'><strong>Objetivo:</strong> {mission['subtitle']}</p>
+<p style='color: #e2e8f0; font-size: 0.9rem; margin: 0;'>{mission['description']}</p>
+</div>""", unsafe_allow_html=True)
     
     # Inicializar Fila de Comandos na Session State
     if "rover_command_queue" not in st.session_state:
@@ -237,7 +233,7 @@ def render_rover_simulator(user: dict):
 
         # Renderizar Grid Visual em HTML/CSS
         # Eixo Y de cima para baixo (g_size-1 até 0)
-        grid_html = "<div style='display: grid; grid-template-columns: repeat(" + str(g_size) + ", 1fr); gap: 6px; background: rgba(30,12,12,0.85); border: 2px solid #ff6b6b; padding: 12px; border-radius: 12px; box-shadow: 0 8px 30px rgba(255,107,107,0.25);'>"
+        grid_html = f"<div style='display: grid; grid-template-columns: repeat({g_size}, 1fr); gap: 6px; background: rgba(30,12,12,0.85); border: 2px solid #ff6b6b; padding: 12px; border-radius: 12px; box-shadow: 0 8px 30px rgba(255,107,107,0.25);'>"
         
         path_set = set(path_history[:-1]) # posições anteriores percorridas
         
@@ -250,12 +246,12 @@ def render_rover_simulator(user: dict):
                 # Posição Atual do Rover
                 if (x, y) == (cur_x, cur_y):
                     dir_icon = ["👉 🤖", "👇 🤖", "👈 🤖", "👆 🤖"][cur_dir]
-                    cell_content = f"<div style='font-size: 1.4rem; text-shadow: 0 0 10px #00d4ff;'>{dir_icon}</div><span style='font-size:0.65rem; color:#00d4ff; font-weight:bold;'>ROVER</span>"
+                    cell_content = f"<div style='font-size: 1.3rem; text-shadow: 0 0 10px #00d4ff;'>{dir_icon}</div><span style='font-size:0.65rem; color:#00d4ff; font-weight:bold;'>ROVER</span>"
                     cell_bg = "rgba(0, 212, 255, 0.25)"
                     cell_border = "2px solid #00d4ff"
                 # Ponto de Destino / Alvo
                 elif (x, y) == mission["target"]:
-                    cell_content = "<div style='font-size: 1.4rem;'>🪨</div><span style='font-size:0.65rem; color:#ffd166; font-weight:bold;'>ALVO</span>"
+                    cell_content = f"<div style='font-size: 1.3rem;'>{mission['target_icon'].split()[0]}</div><span style='font-size:0.65rem; color:#ffd166; font-weight:bold;'>ALVO</span>"
                     cell_bg = "rgba(255, 209, 102, 0.2)"
                     cell_border = "2px solid #ffd166"
                 # Ponto de Partida Inicial
@@ -263,7 +259,7 @@ def render_rover_simulator(user: dict):
                     cell_content = "<div style='font-size: 1.2rem;'>🚀</div><span style='font-size:0.65rem; color:#4ade80;'>INÍCIO</span>"
                 # Crateras / Perigos
                 elif (x, y) in mission["craters"]:
-                    cell_content = "<div style='font-size: 1.3rem;'>🌋</div><span style='font-size:0.65rem; color:#f87171;'>PERIGO</span>"
+                    cell_content = "<div style='font-size: 1.2rem;'>🌋</div><span style='font-size:0.65rem; color:#f87171;'>PERIGO</span>"
                     cell_bg = "rgba(239, 68, 68, 0.2)"
                 # Rastro de Caminho Percorrido
                 elif (x, y) in path_set:
@@ -272,11 +268,7 @@ def render_rover_simulator(user: dict):
                 else:
                     cell_content = f"<span style='font-size:0.65rem; color:#78350f;'>({x},{y})</span>"
                     
-                grid_html += f"""
-                    <div style='background: {cell_bg}; border: {cell_border}; height: 60px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;'>
-                        {cell_content}
-                    </div>
-                """
+                grid_html += f"<div style='background: {cell_bg}; border: {cell_border}; min-height: 55px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;'>{cell_content}</div>"
         grid_html += "</div>"
         
         st.markdown(grid_html, unsafe_allow_html=True)
