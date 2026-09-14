@@ -257,3 +257,33 @@ h1, h2, h3, .cosmic-title {
     padding-bottom: 4px;
 }
 
+.fundamento-box {
+    background: linear-gradient(135deg, rgba(30, 25, 15, 0.85), rgba(20, 24, 45, 0.85));
+    border: 1px solid rgba(255, 209, 102, 0.45);
+    border-left: 6px solid #ffd166;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin: 18px 0;
+    box-shadow: 0 8px 30px rgba(255, 209, 102, 0.08);
+}
+
+.fundamento-box h4 {
+    font-family: 'Orbitron', 'Rajdhani', sans-serif;
+    letter-spacing: 0.04em;
+}
+
+.fundamento-box ul, .fundamento-box ol {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.fundamento-box li {
+    margin-bottom: 6px;
+    color: #e2e8f0;
+}
+
+.fundamento-box strong {
+    color: #ffd166;
+}
+
+

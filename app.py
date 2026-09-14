@@ -102,7 +102,7 @@ with st.sidebar:
     area_choice = st.selectbox(
         "Selecione a Área da Estação:",
         [
-            "🎓 1. ACADEMIA STEAM (Trilhas & Lab)",
+            "🎓 1. ACADEMIA NOVA STELLARIS (Fundamentos & Trilhas)",
             "🔭 2. EXPLORAÇÃO & CIÊNCIA",
             "🕹️ 3. ARCADE CÓSMICO & JOGOS",
             "🤖 4. MENTORIA IA & CONQUISTAS"
@@ -114,8 +114,8 @@ with st.sidebar:
         nav_option = st.radio(
             "Módulo de Aprendizado:",
             [
-                "🎓 Academia STEAM (Trilhas Graduadas)",
-                "🧮 Laboratório Integrado STEAM"
+                "🎓 Academia Nova Stellaris (Fundamentos & Trilhas)",
+                "🧪 Laboratório Prático de Experimentos"
             ],
             key="nav_mod_academy"
         )
@@ -162,13 +162,13 @@ with st.sidebar:
 # Atualizar dados do usuário a cada render
 user = get_or_create_user(st.session_state.current_username, st.session_state.current_avatar)
 
-if nav_option == "🎓 Academia STEAM (Trilhas Graduadas)":
+if nav_option == "🎓 Academia Nova Stellaris (Fundamentos & Trilhas)":
     render_steam_academy(user)
 elif nav_option == "🌌 Observatório do Cosmos":
     render_observatory(user)
 elif nav_option == "🚀 Missões Sci-Fi Interativas":
     render_sci_fi_missions(user)
-elif nav_option == "🧮 Laboratório Integrado STEAM":
+elif nav_option == "🧪 Laboratório Prático de Experimentos":
     render_steam_lab(user)
 elif nav_option == "🕹️ Arcade Cósmico (3 Jogos Sci-Fi)":
     render_arcade_hub(user)
