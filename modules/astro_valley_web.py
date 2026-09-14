@@ -1,4 +1,4 @@
-﻿"""
+"""
 Nova Stellaris - Módulo Astro-Valley (Simulador Web do Domo Marciano)
 Jogo 2D interativo estilo Stardew Valley Espacial em HTML5 Canvas + JS + Streamlit.
 """
@@ -22,36 +22,38 @@ def render_astro_valley(user: dict):
     with col_info:
         st.markdown("""
             <div class='cosmic-card' style='border-left: 4px solid #4ade80;'>
-                <h3 style='color: #4ade80; margin-top: 0;'>🎮 Teclas de Atalho</h3>
-                <p style='font-size: 0.9rem;'>⌨️ <strong>Teclado:</strong></p>
-                <ul style='font-size: 0.85rem; color: #cbd5e1; padding-left: 20px; line-height: 1.6;'>
-                    <li><code>W</code> ou <code>▲</code>: Mover para Cima</li>
-                    <li><code>S</code> ou <code>▼</code>: Mover para Baixo</li>
-                    <li><code>A</code> ou <code>◀</code>: Mover para Esquerda</li>
-                    <li><code>D</code> ou <code>▶</code>: Mover para Direita</li>
-                    <li><code>Espaço</code>: Realizar Ação</li>
-                </ul>
+                <h3 style='color: #4ade80; margin-top: 0;'>🎮 Instruções da Missão</h3>
+                <p style='font-size: 0.9rem;'>🎯 <strong>Objetivo de Resgate:</strong></p>
+                <p style='font-size: 0.85rem; color: #cbd5e1; line-height: 1.5;'>
+                    Sobreviva até o <strong>Sol 5</strong> e colha pelo menos <strong>5 Batatas</strong> espaciais para garantir a sobrevivência e resgate da Ares III!
+                </p>
                 <hr style='border-color: rgba(74,222,128,0.2);'>
+                <p style='font-size: 0.9rem;'>⌨️ <strong>Controles:</strong></p>
+                <ul style='font-size: 0.85rem; color: #cbd5e1; padding-left: 20px; line-height: 1.6;'>
+                    <li><code>W, A, S, D</code> ou <code>Setas</code>: Mover</li>
+                    <li><code>Espaço</code> ou <code>E</code>: Ação no Domo</li>
+                </ul>
                 <p style='font-size: 0.85rem; color: #cbd5e1;'>
-                    📱 <strong>Touchscreen / Mouse:</strong> Use os botões luminosos abaixo da tela do jogo!
+                    📱 <strong>Touch / Mouse:</strong> D-Pad e Botão de Ação luminosos abaixo do domo!
                 </p>
             </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("### 🏆 Conquistas do Astro-Valley")
+        st.markdown("### 🏆 Conquistas do Domo")
         st.markdown("""
-            - 🌾 **Agricultor Marciano:** Colha 10 safras de batatas (+150 XP)
-            - ⚡ **Pioneiro da Energia:** Gere 100 kWh de energia (+150 XP)
+            - 🌾 **Agricultor Marciano:** Colha 10 safras (+150 XP)
+            - ⚡ **Pioneiro da Energia:** Eficiência 100% (+150 XP)
             - 🪐 **Sobrevivente dos Sols:** Sobreviva a 10 Sols (+200 XP)
         """)
         
         with st.expander("🎁 Sincronizar Recompensas do Jogo", expanded=True):
-            st.write("Conforme você colhe, gera energia e sobrevive a novos Sols, reivindique seu XP no botão abaixo:")
-            sync_sol = st.number_input("Sols Completados no Jogo:", min_value=1, max_value=100, value=1, step=1, key="astro_valley_sol")
+            st.write("Após completar a missão ou expandir sua colônia, registre seus pontos:")
+            sync_sol = st.number_input("Sols Completados:", min_value=1, max_value=100, value=1, step=1, key="astro_valley_sol")
             sync_harvest = st.number_input("Batatas Colhidas:", min_value=0, max_value=500, value=0, step=1, key="astro_valley_harvest")
+            colony_rescued = st.checkbox("Missão Cumprida (Sol 5+ & 5+ Batatas)?", value=False, key="astro_valley_won_check")
             
             if st.button("🌟 Reivindicar XP da Colônia!", type="primary", key="astro_valley_claim_btn"):
-                earned_xp = (sync_sol * 25) + (sync_harvest * 15)
+                earned_xp = (sync_sol * 25) + (sync_harvest * 15) + (200 if colony_rescued else 0)
                 add_xp(user["id"], earned_xp)
                 
                 if sync_harvest >= 10:
@@ -222,7 +224,35 @@ def render_astro_valley(user: dict):
                 transition: opacity 0.3s;
                 opacity: 0;
                 box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+                z-index: 5;
             }
+            
+            .screen-overlay {
+                position: absolute;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(15, 23, 42, 0.94);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 24px;
+                z-index: 10;
+            }
+            .btn-start {
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: #ffffff;
+                font-size: 17px;
+                font-weight: 800;
+                padding: 12px 30px;
+                border: 2px solid #34d399;
+                border-radius: 30px;
+                cursor: pointer;
+                box-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
+                transition: transform 0.15s, box-shadow 0.15s;
+                margin-top: 16px;
+            }
+            .btn-start:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(52, 211, 153, 0.8); }
         </style>
         </head>
         <body>
@@ -232,11 +262,51 @@ def render_astro_valley(user: dict):
                 <div class="hud-item">🪐 Sol: <span id="sol-val" class="val">1</span></div>
                 <div class="hud-item">⚡ Energia: <span id="energy-val" class="val">100%</span></div>
                 <div class="hud-item">💧 Água: <span id="water-val" class="val">50L</span></div>
-                <div class="hud-item">🥔 Batatas: <span id="potato-val" class="val">0</span></div>
+                <div class="hud-item">🥔 Batatas: <span id="potato-val" class="val">0/5</span></div>
                 <div class="hud-item">⛏️ Minério: <span id="ore-val" class="val">0</span></div>
             </div>
             <canvas id="gameCanvas" width="640" height="380" tabindex="1"></canvas>
             <div id="message-banner">Mensagem da Base</div>
+
+            <!-- TELA DE INÍCIO -->
+            <div id="start-screen" class="screen-overlay">
+                <h1 style="color: #4ade80; font-size: 26px; margin-bottom: 8px;">🌾 ASTRO-VALLEY: DOMO MARCIANO</h1>
+                <p style="color: #cbd5e1; font-size: 14px; max-width: 500px; line-height: 1.5;">
+                    Você é o botânico e engenheiro da missão Ares III em Marte! Cultive batatas no solo marciano, 
+                    limpe os painéis solares para manter a energia e sintetize água pura através de reações químicas.
+                </p>
+                <div style="margin-top: 14px; padding: 10px 16px; background: rgba(30, 41, 59, 0.8); border-radius: 10px; border-left: 3px solid #4ade80; font-size: 13px; color: #f1f5f9; text-align: left;">
+                    🎯 <strong>Meta da Missão:</strong> Sobreviva até o <strong>Sol 5</strong> e colha pelo menos <strong>5 Batatas</strong> para garantir o resgate da tripulação!<br>
+                    🚜 <strong>Mover:</strong> <code>W,A,S,D</code> ou Setas | 🌱 <strong>Ação no Domo:</strong> <code>ESPAÇO</code> ou Botão Ação
+                </div>
+                <button class="btn-start" onclick="startGame()">🚀 INICIAR MISSÃO MARCIANA</button>
+            </div>
+
+            <!-- TELA DE VITÓRIA / RESGATE -->
+            <div id="win-screen" class="screen-overlay" style="display: none;">
+                <h1 style="color: #4ade80; font-size: 26px; margin-bottom: 8px;">🎉 COLÔNIA RESGATADA COM SUCESSO!</h1>
+                <p style="color: #fde047; font-size: 16px; font-weight: bold; margin-bottom: 6px;">
+                    Mark Watney comemora: "A ciência venceu! Temos comida e energia para aguardar a Hermes!" 🚀
+                </p>
+                <p style="color: #cbd5e1; font-size: 13.5px; max-width: 480px;">
+                    Você dominou a botânica espacial, a síntese de água e a energia fotovoltaica em Marte!
+                </p>
+                <div id="win-stats-txt" style="margin-top: 12px; font-size: 14px; color: #38bdf8; font-weight: bold; background: rgba(0,0,0,0.3); padding: 8px 18px; border-radius: 8px;"></div>
+                <div style="display: flex; gap: 10px; margin-top: 14px;">
+                    <button class="btn-start" style="background:#0284c7; border-color:#38bdf8;" onclick="continueSandbox()">🌾 CONTINUAR CULTIVANDO</button>
+                    <button class="btn-start" style="background:#10b981;" onclick="startGame()">🔄 NOVO JOGO</button>
+                </div>
+            </div>
+
+            <!-- TELA DE GAME OVER -->
+            <div id="gameover-screen" class="screen-overlay" style="display: none;">
+                <h1 style="color: #f43f5e; font-size: 26px; margin-bottom: 8px;">💥 COLAPSO NO SUPORTE DE VIDA!</h1>
+                <p id="gameover-reason" style="color: #cbd5e1; font-size: 14px; max-width: 480px; line-height: 1.4;">
+                    Os sistemas vitais do domo falharam por falta de energia crítica ou oxigênio/água.
+                </p>
+                <div id="lose-stats-txt" style="margin-top: 12px; font-size: 14px; color: #ffd166; background: rgba(0,0,0,0.3); padding: 8px 18px; border-radius: 8px;"></div>
+                <button class="btn-start" style="background:#f43f5e; border-color:#fb7185; color:white;" onclick="startGame()">🔄 REINICIAR COLÔNIA</button>
+            </div>
         </div>
 
         <!-- PAINEL DE CONTROLES LUMINOSOS E VISÍVEIS -->
@@ -285,6 +355,9 @@ def render_astro_valley(user: dict):
             canvas.addEventListener('click', () => { canvas.focus(); });
 
             // Estado do Jogo
+            let gameState = 'START'; // 'START', 'PLAYING', 'SANDBOX', 'WIN', 'GAMEOVER'
+            let energyZeroTicks = 0;
+
             const state = {
                 player: { x: 300, y: 190, size: 24, speed: 3.8, dir: 'down', animFrame: 0 },
                 keys: { up: false, down: false, left: false, right: false },
@@ -311,6 +384,51 @@ def render_astro_valley(user: dict):
                 b.innerText = text;
                 b.style.opacity = '1';
                 setTimeout(() => { b.style.opacity = '0'; }, 2500);
+            }
+
+            function startGame() {
+                document.getElementById('start-screen').style.display = 'none';
+                document.getElementById('win-screen').style.display = 'none';
+                document.getElementById('gameover-screen').style.display = 'none';
+                
+                gameState = 'PLAYING';
+                state.sol = 1;
+                state.timeOfDay = 0;
+                state.energy = 100;
+                state.water = 50;
+                state.potatoes = 0;
+                state.ores = 0;
+                state.solarDust = 0;
+                energyZeroTicks = 0;
+                state.player.x = 300;
+                state.player.y = 190;
+                
+                for (let plot of state.plots) {
+                    plot.state = 'empty';
+                    plot.progress = 0;
+                }
+                updateHud();
+                canvas.focus();
+            }
+
+            function continueSandbox() {
+                document.getElementById('win-screen').style.display = 'none';
+                gameState = 'SANDBOX';
+                updateHud();
+                canvas.focus();
+            }
+
+            function triggerWin() {
+                gameState = 'WIN';
+                document.getElementById('win-stats-txt').innerHTML = `📊 Sols Sobrevividos: <strong>${state.sol}</strong> | 🥔 Batatas: <strong>${state.potatoes}</strong> | ⛏️ Minérios: <strong>${state.ores}</strong>`;
+                document.getElementById('win-screen').style.display = 'flex';
+            }
+
+            function triggerGameOver(reason) {
+                gameState = 'GAMEOVER';
+                document.getElementById('gameover-reason').innerText = reason;
+                document.getElementById('lose-stats-txt').innerHTML = `Sobreviveu até o <strong>Sol ${state.sol}</strong> | 🥔 Batatas: <strong>${state.potatoes}</strong>`;
+                document.getElementById('gameover-screen').style.display = 'flex';
             }
 
             // Captura de Teclado
@@ -342,11 +460,18 @@ def render_astro_valley(user: dict):
                 }
             }
 
-            function startMove(dir) { state.keys[dir] = true; }
-            function stopMove(dir) { state.keys[dir] = false; }
+            function startMove(dir) { 
+                state.keys[dir] = true; 
+                updateBtnVisual('btn-' + dir, true);
+            }
+            function stopMove(dir) { 
+                state.keys[dir] = false; 
+                updateBtnVisual('btn-' + dir, false);
+            }
 
             // Lógica de Ação no Domo
             function performAction() {
+                if (gameState !== 'PLAYING' && gameState !== 'SANDBOX') return;
                 const p = state.player;
                 
                 // 1. Canteiros
@@ -423,11 +548,30 @@ def render_astro_valley(user: dict):
                 document.getElementById('sol-val').innerText = state.sol;
                 document.getElementById('energy-val').innerText = Math.round(state.energy) + '%';
                 document.getElementById('water-val').innerText = state.water + 'L';
-                document.getElementById('potato-val').innerText = state.potatoes;
+                document.getElementById('potato-val').innerText = state.potatoes + (gameState === 'PLAYING' ? ' / 5' : '');
                 document.getElementById('ore-val').innerText = state.ores;
             }
 
             function update() {
+                if (gameState !== 'PLAYING' && gameState !== 'SANDBOX') return;
+
+                // Verificação de Vitória
+                if (gameState === 'PLAYING' && state.sol >= 5 && state.potatoes >= 5) {
+                    triggerWin();
+                    return;
+                }
+
+                // Verificação de Falha no Suporte de Vida
+                if (state.energy <= 0) {
+                    energyZeroTicks++;
+                    if (energyZeroTicks > 240) {
+                        triggerGameOver('A rede de energia solar esgotou completamente e os aquecedores do domo congelaram!');
+                        return;
+                    }
+                } else {
+                    energyZeroTicks = Math.max(0, energyZeroTicks - 1);
+                }
+
                 const p = state.player;
                 let moved = false;
 
