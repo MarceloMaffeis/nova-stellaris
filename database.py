@@ -591,7 +591,13 @@ def get_chat_history(user_id: int, limit: int = 50) -> List[Dict[str, Any]]:
     cursor.execute("SELECT sender, message, created_at FROM chat_history WHERE user_id = ? ORDER BY id ASC LIMIT ?", (user_id, limit))
     rows = cursor.fetchall()
     conn.close()
-    return [dict(r) for r in rows]
+    result = []
+    for r in rows:
+        d = dict(r)
+        d["role"] = d.get("sender", "user")
+        d["content"] = d.get("message", "")
+        result.append(d)
+    return result
 
 def get_quiz_questions(pillar: Optional[str] = None, difficulty: Optional[str] = None, limit: int = 10) -> List[Dict[str, Any]]:
     conn = get_connection()

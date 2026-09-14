@@ -1,4 +1,4 @@
-﻿"""
+"""
 Nova Stellaris - Serviço de Inteligência Artificial CosmoAI
 Integração de ponta com Google Gemini API para tutoria espacial STEAM e narrativa interativa.
 """
@@ -52,7 +52,9 @@ def ask_cosmo(prompt: str, chat_history: list = None) -> str:
         if chat_history:
             recent = chat_history[-4:]
             for msg in recent:
-                context_parts.append(f"{msg.get('role', 'user')}: {msg.get('content', '')}")
+                r_name = msg.get('role', msg.get('sender', 'user'))
+                c_text = msg.get('content', msg.get('message', ''))
+                context_parts.append(f"{r_name}: {c_text}")
         context_parts.append(f"Pergunta do aluno: {prompt}")
         
         full_prompt = "\n\n".join(context_parts)

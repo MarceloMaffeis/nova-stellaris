@@ -1,4 +1,4 @@
-﻿"""
+"""
 Nova Stellaris - Módulo CosmoAI (Mentor Espacial)
 Interface de Chat Interativo com Google Gemini API e Gerador de Enigmas.
 """
@@ -81,10 +81,12 @@ def render_cosmo_ai(user: dict):
                 """, unsafe_allow_html=True)
             else:
                 for msg in history:
-                    if msg["role"] == "user":
-                        st.markdown(f"<div class='chat-user'><strong>Você:</strong> {msg['content']}</div>", unsafe_allow_html=True)
+                    role = msg.get("role", msg.get("sender", "user"))
+                    content = msg.get("content", msg.get("message", ""))
+                    if role == "user":
+                        st.markdown(f"<div class='chat-user'><strong>Você:</strong> {content}</div>", unsafe_allow_html=True)
                     else:
-                        st.markdown(f"<div class='chat-cosmo'><strong>🤖 Cosmo:</strong> {msg['content']}</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div class='chat-cosmo'><strong>🤖 Cosmo:</strong> {content}</div>", unsafe_allow_html=True)
                         
         # Caixa de entrada
         prefill_text = st.session_state.pop("user_question_input", "")
