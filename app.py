@@ -23,7 +23,7 @@ st.set_page_config(
     page_title="Nova Stellaris — Centro de Comando STEAM",
     page_icon="🚀",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # Injetar meta tags Open Graph diretamente no index.html do Streamlit para crawlers de redes sociais (WhatsApp, etc.)
@@ -228,120 +228,7 @@ else:
     progress_pct = rank_info["progress_pct"]
     unlocked_badges = set(get_user_badges(user["id"]))
 
-    # ----------------------------------------------------------------------
-    # BARRA LATERAL (SIDEBAR): PERFIL DO USUÁRIO & NAVEGAÇÃO DE APOIO
-    # ----------------------------------------------------------------------
-    with st.sidebar:
-        st.markdown("""
-            <div style='text-align: center; margin-bottom: 12px;'>
-                <h1 style='color: #00d4ff; font-size: 1.7rem; margin: 0;'>NOVA STELLARIS</h1>
-                <p style='color: #94a3b8; font-size: 0.85rem; margin: 0;'>Estação Científica STEAM</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Cartão de Perfil do Usuário
-        role_badge_html = "<span class='role-badge-teacher'>👑 Docente / Professor</span>" if is_teacher else f"<span class='role-badge-student'>👩‍🚀 {user.get('class_name', 'Aluno')}</span>"
-        
-        st.markdown(f"""
-            <div class='xp-container'>
-                <div style='display: flex; align-items: center; gap: 12px;'>
-                    <span style='font-size: 2.3rem;'>{user['avatar']}</span>
-                    <div>
-                        <h3 style='margin: 0; color: #f1f5f9; font-size: 1.1rem;'>{user['name']}</h3>
-                        <div style='margin-top: 3px;'>{role_badge_html}</div>
-                    </div>
-                </div>
-                <div style='margin-top: 10px; display: flex; justify-content: space-between; font-size: 0.8rem; color: #94a3b8;'>
-                    <span>Pontos: <strong style='color: #ffd166;'>{user['xp']} XP</strong></span>
-                    <span>{f"{current_rank['icon']} {current_rank['title']}"}</span>
-                </div>
-                <div class='xp-bar-bg'>
-                    <div class='xp-bar-fill' style='width: {progress_pct}%;'></div>
-                </div>
-                <div style='margin-top: 8px; text-align: center; font-size: 0.75rem; color: #cbd5e1;'>
-                    🏅 <strong>{len(unlocked_badges)} de {len(BADGES)}</strong> medalhas conquistadas
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Botão direto para o Menu Principal
-        is_at_home = st.session_state.current_page == "home"
-        if st.button("🏠 Menu Principal (Início)", use_container_width=True, type="primary" if is_at_home else "secondary"):
-            st.session_state.current_page = "home"
-            st.rerun()
 
-        # Botão de Acesso ao Painel do Docente
-        if is_teacher:
-            if st.button("👑 Painel do Docente (Admin)", use_container_width=True):
-                st.session_state.current_page = "admin_dashboard"
-                st.rerun()
-
-        st.markdown("---")
-
-        # Atalhos rápidos para navegar sem voltar (caso queira)
-        with st.expander("🧭 Acesso Rápido aos Módulos", expanded=False):
-            st.caption("Salte diretamente para qualquer aplicativo:")
-            if st.button("🪐 Atlas dos Mundos", use_container_width=True, key="sb_atlas"):
-                st.session_state.current_page = "obs_atlas"
-                st.rerun()
-            if st.button("⚖️ Balança Planetária", use_container_width=True, key="sb_balance"):
-                st.session_state.current_page = "obs_balance"
-                st.rerun()
-            if st.button("🧪 Laboratório STEAM", use_container_width=True, key="sb_steam_lab"):
-                st.session_state.current_page = "steam_chem"
-                st.rerun()
-            if st.button("💻 Terminal do Rover", use_container_width=True, key="sb_rover"):
-                st.session_state.current_page = "steam_rover"
-                st.rerun()
-            if st.button("🚀 Missões Sci-Fi", use_container_width=True, key="sb_scifi"):
-                st.session_state.current_page = "scifi_martian"
-                st.rerun()
-            if st.button("🎮 Arcade Cósmico", use_container_width=True, key="sb_arcade"):
-                st.session_state.current_page = "arcade_hub"
-                st.rerun()
-            if st.button("📚 Biblioteca Cósmica", use_container_width=True, key="sb_library"):
-                st.session_state.current_page = "lib_encyclopedia"
-                st.rerun()
-            if st.button("🤖 CosmoAI Mentor", use_container_width=True, key="sb_cosmo"):
-                st.session_state.current_page = "cosmo_ai"
-                st.rerun()
-            if st.button("🎮 AstroQuiz STEAM", use_container_width=True, key="sb_quiz"):
-                st.session_state.current_page = "quiz_game"
-                st.rerun()
-            if st.button("🏆 Minhas Insígnias", use_container_width=True, key="sb_badges"):
-                st.session_state.current_page = "badges_gallery"
-                st.rerun()
-
-        # Edição de Perfil
-        with st.expander("⚙️ Editar Meu Perfil", expanded=False):
-            new_name = st.text_input("Seu Nome:", value=user["name"])
-            avatar_options = ["👩‍🚀", "👨‍🚀", "🚀", "🤖", "👾", "🌟", "🪐", "🔬", "🔭"]
-            new_avatar = st.selectbox("Seu Avatar:", avatar_options, index=avatar_options.index(user["avatar"]) if user["avatar"] in avatar_options else 0)
-            
-            if st.button("Salvar Alterações", key="btn_save_profile"):
-                if new_name.strip():
-                    update_user_profile(user["id"], new_name.strip(), new_avatar)
-                    st.session_state.current_user["name"] = new_name.strip()
-                    st.session_state.current_user["avatar"] = new_avatar
-                    st.session_state.current_username = new_name.strip()
-                    st.session_state.current_avatar = new_avatar
-                    st.success("Perfil atualizado!")
-                    st.rerun()
-                    
-        # Botão de Logout
-        if st.button("🚪 Sair / Trocar de Conta", use_container_width=True, key="btn_logout"):
-            st.session_state.authenticated = False
-            st.session_state.current_user = None
-            st.session_state.current_page = "home"
-            st.rerun()
-            
-        st.markdown("---")
-        st.markdown("""
-            <div style='text-align: center; color: #64748b; font-size: 0.8rem;'>
-                <p>⭐ Desenvolvido para jovens cientistas curiosos</p>
-                <p><a href='https://github.com/MarceloMaffeis/nova-stellaris' target='_blank' style='color: #00d4ff; text-decoration: none;'>GitHub: MarceloMaffeis/nova-stellaris</a></p>
-            </div>
-        """, unsafe_allow_html=True)
 
     # ----------------------------------------------------------------------
     # FUNÇÃO: RENDERIZAR GALERIA DE INSÍGNIAS
@@ -380,25 +267,83 @@ else:
     # FUNÇÃO: RENDERIZAR O CENTRO DE COMANDO (TELA CHEIA PRINCIPAL)
     # ----------------------------------------------------------------------
     def render_command_center():
-        # Hero Banner de Boas-Vindas
-        st.markdown(f"""
-            <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(16,30,65,0.95), rgba(10,18,45,0.95)); border: 1px solid #00d4ff;'>
-                <div style='display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap;'>
-                    <span style='font-size: 3.2rem;'>{user['avatar']}</span>
-                    <div style='text-align: left;'>
-                        <h1 style='color: #00d4ff; margin: 0; font-size: 2rem;'>Centro de Comando — Cadete {user['name']}</h1>
-                        <p style='color: #cbd5e1; font-size: 1.05rem; margin: 4px 0 0 0;'>
-                            Turma: <strong>{user.get('class_name', '6º Ano')}</strong> &nbsp;|&nbsp; Patente: <strong style='color: {current_rank['badge_color']};'>{current_rank['icon']} {current_rank['title']}</strong> &nbsp;|&nbsp; XP: <strong style='color: #ffd166;'>{user['xp']} pts</strong>
-                        </p>
+        # HEADER DO CENTRO DE COMANDO: BRANDING À ESQUERDA + CARTÃO DO CADETE À DIREITA
+        col_header_left, col_header_right = st.columns([1.5, 1.3], gap="medium")
+
+        with col_header_left:
+            st.markdown("""
+                <div class='cosmic-hero' style='text-align: left; padding: 20px 24px; height: 100%; display: flex; flex-direction: column; justify-content: center; background: linear-gradient(135deg, rgba(16,30,65,0.95), rgba(10,18,45,0.95)); border: 1px solid #00d4ff;'>
+                    <div style='display: flex; align-items: center; gap: 14px;'>
+                        <span style='font-size: 2.6rem;'>🚀</span>
+                        <div>
+                            <h1 style='color: #00d4ff; font-size: 1.85rem; margin: 0; letter-spacing: 0.04em;'>NOVA STELLARIS</h1>
+                            <p style='color: #ffd166; font-size: 0.92rem; margin: 2px 0 0 0; font-weight: 600;'>Centro de Comando Espacial STEAM</p>
+                        </div>
+                    </div>
+                    <p style='color: #cbd5e1; font-size: 0.88rem; margin: 10px 0 0 0; line-height: 1.4;'>
+                        Bem-vindo à estação científica! Acesse diretamente os simuladores, laboratórios e missões nos setores abaixo com visualização em tela cheia.
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
+
+        with col_header_right:
+            role_badge_html = "<span class='role-badge-teacher'>👑 Docente / Professor</span>" if is_teacher else f"<span class='role-badge-student'>👩‍🚀 {user.get('class_name', 'Aluno')}</span>"
+            st.markdown(f"""
+                <div class='hud-profile-card'>
+                    <div style='display: flex; align-items: center; justify-content: space-between;'>
+                        <div style='display: flex; align-items: center; gap: 12px;'>
+                            <span style='font-size: 2.4rem;'>{user['avatar']}</span>
+                            <div>
+                                <h3 style='margin: 0; color: #f1f5f9; font-size: 1.15rem;'>{user['name']}</h3>
+                                <div style='margin-top: 3px;'>{role_badge_html}</div>
+                            </div>
+                        </div>
+                        <div style='text-align: right;'>
+                            <span style='color: #ffd166; font-size: 1.15rem; font-weight: 800;'>{user['xp']} XP</span><br>
+                            <span style='color: {current_rank["badge_color"]}; font-size: 0.8rem; font-weight: 600;'>{current_rank["icon"]} {current_rank["title"]}</span>
+                        </div>
+                    </div>
+                    <div class='xp-bar-bg' style='margin: 8px 0 6px 0;'>
+                        <div class='xp-bar-fill' style='width: {progress_pct}%;'></div>
+                    </div>
+                    <div style='display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem; color: #cbd5e1;'>
+                        <span>🏅 <strong>{len(unlocked_badges)} de {len(BADGES)}</strong> medalhas</span>
+                        <span style='color: #38bdf8;'>Nível {current_rank["rank"]}</span>
                     </div>
                 </div>
-            </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+
+            c_act1, c_act2, c_act3 = st.columns([1, 1, 1])
+            with c_act1:
+                with st.popover("⚙️ Meu Perfil", use_container_width=True):
+                    st.markdown("#### Editar Dados")
+                    new_name = st.text_input("Seu Nome:", value=user["name"], key="hud_name_input")
+                    avatar_options = ["👩‍🚀", "👨‍🚀", "🚀", "🤖", "👾", "🌟", "🪐", "🔬", "🔭"]
+                    new_avatar = st.selectbox("Seu Avatar:", avatar_options, index=avatar_options.index(user["avatar"]) if user["avatar"] in avatar_options else 0, key="hud_avatar_input")
+                    if st.button("Salvar Perfil", key="btn_save_hud_profile", type="primary", use_container_width=True):
+                        if new_name.strip():
+                            update_user_profile(user["id"], new_name.strip(), new_avatar)
+                            st.session_state.current_user["name"] = new_name.strip()
+                            st.session_state.current_user["avatar"] = new_avatar
+                            st.session_state.current_username = new_name.strip()
+                            st.session_state.current_avatar = new_avatar
+                            st.success("Perfil atualizado!")
+                            st.rerun()
+            with c_act2:
+                if st.button("🏆 Medalhas", use_container_width=True, key="btn_hud_medals"):
+                    st.session_state.current_page = "badges_gallery"
+                    st.rerun()
+            with c_act3:
+                if st.button("🚪 Sair", use_container_width=True, key="btn_hud_logout"):
+                    st.session_state.authenticated = False
+                    st.session_state.current_user = None
+                    st.session_state.current_page = "home"
+                    st.rerun()
 
         # Se for professor, banner especial de acesso ao painel do docente
         if is_teacher:
             st.markdown("""
-                <div style='background: linear-gradient(135deg, rgba(35,25,60,0.9), rgba(20,15,40,0.9)); border: 1px solid #ffd166; border-radius: 12px; padding: 14px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;'>
+                <div style='background: linear-gradient(135deg, rgba(35,25,60,0.9), rgba(20,15,40,0.9)); border: 1px solid #ffd166; border-radius: 12px; padding: 12px 18px; margin-top: 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;'>
                     <div>
                         <h4 style='color: #ffd166; margin: 0;'>👑 Modo Docente Ativo</h4>
                         <p style='color: #cbd5e1; font-size: 0.85rem; margin: 2px 0 0 0;'>Gerencie turmas, crie missões para seus alunos e acompanhe o desempenho da classe.</p>
@@ -426,7 +371,7 @@ else:
                     </div>
                 """, unsafe_allow_html=True)
 
-        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 1rem; margin: 15px 0 25px 0;'>✨ <strong>Clique em qualquer aplicativo abaixo</strong> para abrir diretamente a ferramenta desejada:</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 0.95rem; margin: 15px 0 20px 0;'>✨ <strong>Clique em qualquer aplicativo abaixo</strong> para abrir diretamente a ferramenta desejada:</p>", unsafe_allow_html=True)
 
         # ======================================================================
         # SETOR 1: 🔭 OBSERVATÓRIO DO COSMOS
@@ -807,17 +752,27 @@ else:
     else:
         cfg = page_configs.get(current_page, {"title": "Estação Espacial", "icon": "🚀", "sector": "Nova Stellaris"})
         
-        # Barra de Topo com Botão Voltar
-        col_btn_back, col_nav_info = st.columns([1.2, 3.8])
+        # Barra de Topo com Botão Voltar e Chip do Astronauta
+        col_btn_back, col_nav_info, col_user_chip = st.columns([1.1, 2.6, 1.3])
         with col_btn_back:
-            if st.button("⬅️ Voltar ao Menu Principal", key="btn_top_back", use_container_width=True, type="primary"):
+            if st.button("⬅️ Menu Principal", key="btn_top_back", use_container_width=True, type="primary"):
                 st.session_state.current_page = "home"
                 st.rerun()
         with col_nav_info:
             st.markdown(f"""
-                <div class='top-nav-bar' style='margin: 0; padding: 10px 18px;'>
-                    <span class='top-nav-title'>{cfg['icon']} {cfg['title']}</span>
-                    <span class='top-nav-breadcrumb'>Setor: {cfg['sector']}</span>
+                <div class='top-nav-bar' style='margin: 0; padding: 0 16px; height: 42px; display: flex; align-items: center; justify-content: space-between;'>
+                    <span class='top-nav-title' style='font-size: 1.05rem;'>{cfg['icon']} {cfg['title']}</span>
+                    <span class='top-nav-breadcrumb' style='font-size: 0.8rem;'>Setor: {cfg['sector']}</span>
+                </div>
+            """, unsafe_allow_html=True)
+        with col_user_chip:
+            st.markdown(f"""
+                <div style='background: rgba(16, 23, 47, 0.85); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 10px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; height: 42px;'>
+                    <div style='display: flex; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap;'>
+                        <span style='font-size: 1.25rem;'>{user.get("avatar", "👩‍🚀")}</span>
+                        <span style='color: #f1f5f9; font-weight: 600; font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis;'>{user.get("name", "Astronauta")}</span>
+                    </div>
+                    <span style='color: #ffd166; font-weight: 700; font-size: 0.85rem; margin-left: 6px; white-space: nowrap;'>{user.get("xp", 0)} XP</span>
                 </div>
             """, unsafe_allow_html=True)
             
