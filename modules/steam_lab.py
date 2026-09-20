@@ -10,7 +10,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from database import add_xp, unlock_badge
 
-def render_steam_lab(user: dict):
+def render_steam_lab(user: dict, default_lab: str = None):
     st.markdown("""
         <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(6,30,40,0.95), rgba(16,20,47,0.95)); border: 1px solid #00f5d4;'>
             <h1 style='color: #00f5d4; margin-bottom: 5px;'>🧮 Laboratório STEAM do Espaço</h1>
@@ -20,17 +20,36 @@ def render_steam_lab(user: dict):
         </div>
     """, unsafe_allow_html=True)
     
-    pillar = st.tabs([
+    lab_options = [
         "🧪 Química: Forja Estelar & Foguetes",
         "💻 Computação: Terminal do Rover",
         "🧮 Matemática: Potências de 10 & Volume",
         "🌌 Física: Leis de Kepler & Órbitas"
-    ])
+    ]
+    
+    default_idx = 0
+    if default_lab:
+        for i, opt in enumerate(lab_options):
+            if default_lab.lower() in opt.lower():
+                default_idx = i
+                break
+    elif "steam_lab_idx" in st.session_state:
+        default_idx = st.session_state.steam_lab_idx
+
+    active_lab = st.radio(
+        "Bancada do Laboratório:",
+        lab_options,
+        index=default_idx,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="steam_lab_selector"
+    )
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
     
     # ----------------------------------------------------
     # 1. QUÍMICA ESPACIAL
     # ----------------------------------------------------
-    with pillar[0]:
+    if active_lab == lab_options[0]:
         st.subheader("🧪 A Tabela Periódica Forjada nas Estrelas")
         st.markdown("""
             Você sabia que **todos os elementos do seu corpo foram fabricados dentro de estrelas**?
@@ -82,14 +101,14 @@ def render_steam_lab(user: dict):
     # ----------------------------------------------------
     # 2. COMPUTAÇÃO: TERMINAL DO ROVER VISUAL
     # ----------------------------------------------------
-    with pillar[1]:
+    elif active_lab == lab_options[1]:
         from modules.rover_simulator import render_rover_simulator
         render_rover_simulator(user)
 
     # ----------------------------------------------------
     # 3. MATEMÁTICA: POTÊNCIAS DE 10 & NOTAÇÃO CIENTÍFICA
     # ----------------------------------------------------
-    with pillar[2]:
+    elif active_lab == lab_options[2]:
         st.subheader("🧮 O Mago da Notação Científica & Potências de 10")
         st.markdown("""
             No espaço, os números são gigantescos (milhões de anos-luz) ou minúsculos (átomos).
@@ -131,7 +150,7 @@ def render_steam_lab(user: dict):
     # ----------------------------------------------------
     # 4. FÍSICA: LEIS DE KEPLER & VELOCIDADE ORBITAL
     # ----------------------------------------------------
-    with pillar[3]:
+    else:
         st.subheader("🌌 Leis de Johannes Kepler: A Dança dos Planetas")
         st.markdown("""
             Johannes Kepler descobriu que quanto **mais perto do Sol** um planeta está, **mais rápido** ele se move no espaço!

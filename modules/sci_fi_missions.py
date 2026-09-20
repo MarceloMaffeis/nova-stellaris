@@ -18,7 +18,7 @@ def get_img(filename: str) -> str:
         return local_p
     return filename
 
-def render_sci_fi_missions(user: dict):
+def render_sci_fi_missions(user: dict, default_mission: str = None):
     st.markdown("""
         <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(30,16,60,0.95), rgba(16,20,47,0.95)); border: 1px solid #f72585;'>
             <h1 style='color: #ffd166; margin-bottom: 5px;'>🚀 Simulador de Missões Sci-Fi</h1>
@@ -28,15 +28,30 @@ def render_sci_fi_missions(user: dict):
         </div>
     """, unsafe_allow_html=True)
     
+    missions_list = [
+        "🔴 Missão 1: Perdido em Marte (The Martian)",
+        "✨ Missão 2: Devoradores de Estrelas (Project Hail Mary)",
+        "⏳ Missão 3: Gargantua & Planeta Miller (Interestelar)"
+    ]
+    
+    default_idx = 0
+    if default_mission:
+        for i, m in enumerate(missions_list):
+            if default_mission.lower() in m.lower():
+                default_idx = i
+                break
+    elif "scifi_mission_idx" in st.session_state:
+        default_idx = st.session_state.scifi_mission_idx
+        
     mission_choice = st.radio(
         "Selecione sua Operação Espacial:",
-        [
-            "🔴 Missão 1: Perdido em Marte (The Martian)",
-            "✨ Missão 2: Devoradores de Estrelas (Project Hail Mary)",
-            "⏳ Missão 3: Gargantua & Planeta Miller (Interestelar)"
-        ],
-        horizontal=True
+        missions_list,
+        index=default_idx,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="scifi_mission_selector"
     )
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
     
     if "Perdido em Marte" in mission_choice:
         render_the_martian_mission(user)

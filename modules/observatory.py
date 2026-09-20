@@ -266,7 +266,7 @@ JWST_HUBBLE_GALLERY = [
     }
 ]
 
-def render_observatory(user: dict):
+def render_observatory(user: dict, default_tool: str = None):
     st.markdown("""
         <div class='cosmic-hero'>
             <h1 style='color: #00d4ff; margin-bottom: 5px;'>🌌 Observatório do Cosmos</h1>
@@ -276,18 +276,38 @@ def render_observatory(user: dict):
         </div>
     """, unsafe_allow_html=True)
     
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    obs_options = [
         "🪐 Atlas Planetário",
         "⚖️ Balança Interplanetária",
         "🚀 Calculadora de Viagem",
         "📸 Galeria James Webb & Hubble",
         "🌠 Imagem Astronômica do Dia (NASA)"
-    ])
+    ]
+    
+    default_idx = 0
+    if default_tool:
+        for i, opt in enumerate(obs_options):
+            if default_tool.lower() in opt.lower():
+                default_idx = i
+                break
+    elif "observatory_tool_idx" in st.session_state:
+        default_idx = st.session_state.observatory_tool_idx
+        
+    active_obs = st.radio(
+        "Instrumento do Observatório:",
+        obs_options,
+        index=default_idx,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="observatory_tool_selector"
+    )
+    
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
     
     # ------------------------------------------------------------------
     # TAB 1: ATLAS PLANETÁRIO
     # ------------------------------------------------------------------
-    with tab1:
+    if active_obs == obs_options[0]:
         st.subheader("🪐 Atlas do Sistema Solar e Mundos Fascinantes")
         st.write("Clique em um astro para inspecionar seus dados físicos, imagens reais e conexões científicas:")
         
@@ -347,10 +367,10 @@ def render_observatory(user: dict):
         )
         st.plotly_chart(fig_size, use_container_width=True)
 
-    # ------------------------------------------------------------------
+    # ----------------------------------------------------
     # TAB 2: BALANÇA INTERPLANETÁRIA
-    # ------------------------------------------------------------------
-    with tab2:
+    # ----------------------------------------------------
+    elif active_obs == obs_options[1]:
         st.subheader("⚖️ Balança Gravitacional Interplanetária")
         st.write("A sua massa em quilogramas (kg) é constante em qualquer lugar do cosmos, mas o seu **PESO (Força Gravitacional)** muda drasticamente!")
         
@@ -376,10 +396,10 @@ def render_observatory(user: dict):
             unlock_badge(user["id"], "observatory_explorer")
             st.success("Experimento registrado com sucesso no seu Diário de Bordo! (+15 XP)")
 
-    # ------------------------------------------------------------------
+    # ----------------------------------------------------
     # TAB 3: CALCULADORA DE VIAGEM ESPACIAL
-    # ------------------------------------------------------------------
-    with tab3:
+    # ----------------------------------------------------
+    elif active_obs == obs_options[2]:
         st.subheader("🚀 Calculadora de Tempo de Viagem Interplanetária")
         st.write("Descubra quanto tempo levaria para alcançar as fronteiras do espaço com diferentes veículos da humanidade:")
         
@@ -410,10 +430,10 @@ def render_observatory(user: dict):
             </div>
         """, unsafe_allow_html=True)
 
-    # ------------------------------------------------------------------
+    # ----------------------------------------------------
     # TAB 4: GALERIA JAMES WEBB & HUBBLE (ALTA RESOLUÇÃO)
-    # ------------------------------------------------------------------
-    with tab4:
+    # ----------------------------------------------------
+    elif active_obs == obs_options[3]:
         st.subheader("📸 Galeria Cósmica em Alta Resolução (NASA, JWST & Hubble)")
         st.write("Imagens reais captadas pelos maiores observatórios e sondas da história da humanidade:")
         
@@ -432,10 +452,10 @@ def render_observatory(user: dict):
                         </div>
                     """, unsafe_allow_html=True)
 
-    # ------------------------------------------------------------------
+    # ----------------------------------------------------
     # TAB 5: APOD (NASA ASTRONOMY PICTURE OF THE DAY)
-    # ------------------------------------------------------------------
-    with tab5:
+    # ----------------------------------------------------
+    else:
         st.subheader("🌠 Imagem Astronômica do Dia (NASA APOD)")
         st.write("A cada 24 horas, a NASA publica uma fotografia deslumbrante do cosmos acompanhada por uma explicação escrita por astrofísicos:")
         

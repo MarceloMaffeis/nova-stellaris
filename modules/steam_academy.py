@@ -10,7 +10,7 @@ import streamlit as st
 import math
 from database import add_xp, unlock_badge
 
-def render_steam_academy(user: dict):
+def render_steam_academy(user: dict, default_track: str = None):
     st.markdown("""
         <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(16,24,50,0.95), rgba(10,15,35,0.95)); border: 1px solid #00d4ff;'>
             <h1 style='color: #00d4ff; margin-bottom: 5px;'>🎓 Academia Nova Stellaris — Fundamentos & Espaço</h1>
@@ -20,23 +20,39 @@ def render_steam_academy(user: dict):
         </div>
     """, unsafe_allow_html=True)
     
-    tab_math, tab_phys, tab_chem, tab_tech = st.tabs([
+    track_options = [
         "📐 1. Matemática",
         "⚡ 2. Física",
         "🧪 3. Química",
         "💻 4. Tecnologia & Computação"
-    ])
+    ]
     
-    with tab_math:
+    default_idx = 0
+    if default_track:
+        for i, opt in enumerate(track_options):
+            if default_track.lower() in opt.lower():
+                default_idx = i
+                break
+    elif "steam_academy_idx" in st.session_state:
+        default_idx = st.session_state.steam_academy_idx
+
+    active_track = st.radio(
+        "Trilha da Academia:",
+        track_options,
+        index=default_idx,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="steam_academy_selector"
+    )
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    
+    if active_track == track_options[0]:
         _render_math_track(user)
-        
-    with tab_phys:
+    elif active_track == track_options[1]:
         _render_physics_track(user)
-        
-    with tab_chem:
+    elif active_track == track_options[2]:
         _render_chemistry_track(user)
-        
-    with tab_tech:
+    else:
         _render_tech_track(user)
 
 

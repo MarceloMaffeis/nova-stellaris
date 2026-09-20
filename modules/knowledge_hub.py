@@ -4,8 +4,33 @@ Enciclopédia de Pesquisa, Galeria de Cientistas Pioneiros, Guia de Observação
 Catálogo de Missões e Telescópios da NASA/ESA, Simuladores e Recursos Educacionais.
 """
 
+import os
+import base64
 import streamlit as st
 from database import add_xp, unlock_badge
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+IMG_DIR = os.path.join(BASE_DIR, "assets", "images")
+
+def get_img(filename: str) -> str:
+    local_p = os.path.join(IMG_DIR, filename)
+    if os.path.exists(local_p):
+        return local_p
+    return filename
+
+def get_image_src(image_path_or_url: str) -> str:
+    """Converte imagem local para data URI em Base64 para garantir exibição impecável no Streamlit."""
+    if os.path.exists(image_path_or_url):
+        ext = os.path.splitext(image_path_or_url)[1].lower().replace(".", "")
+        if ext == "jpg":
+            ext = "jpeg"
+        try:
+            with open(image_path_or_url, "rb") as f:
+                encoded = base64.b64encode(f.read()).decode("utf-8")
+                return f"data:image/{ext};base64,{encoded}"
+        except Exception:
+            pass
+    return image_path_or_url
 
 # ----------------------------------------------------------------------
 # 1. ENCICLOPÉDIA DE TERMOS E CONCEITOS (BASE DE PESQUISA)
@@ -105,7 +130,7 @@ PIONEER_SCIENTISTS = [
         "nome": "Carl Sagan (1934 – 1996)",
         "titulo": "Astrobiólogo, Divulgador & Poeta do Cosmos",
         "pais": "🇺🇸 Estados Unidos",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Carl_Sagan_Planetary_Society_rom_cropped.jpg/800px-Carl_Sagan_Planetary_Society_rom_cropped.jpg",
+        "foto": get_img("carl_sagan.jpg"),
         "conquistas": "Apresentou a icônica série 'Cosmos', idealizou o Disco de Ouro das sondas Voyager e ensinou a humanidade a olhar para as estrelas com rigor científico e deslumbramento.",
         "frase": "'Diante da vastidão do tempo e da imensidão do universo, é um privilégio compartilhar um planeta e uma era com você.'"
     },
@@ -113,7 +138,7 @@ PIONEER_SCIENTISTS = [
         "nome": "Katherine Johnson (1918 – 2020)",
         "titulo": "Matemática & Física Espacial da NASA",
         "pais": "🇺🇸 Estados Unidos",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Katherine_Johnson_1983.jpg/800px-Katherine_Johnson_1983.jpg",
+        "foto": get_img("katherine_johnson.jpg"),
         "conquistas": "Calculou manualmente com precisão impecável as trajetórias orbitais do voo de John Glenn e da missão Apollo 11 que levou o homem à Lua. Sua história inspirou o livro e filme 'Estrelas Além do Tempo'.",
         "frase": "'Eu gostava de matemática. Contava tudo: os passos que dava, os pratos que lavava... tudo o que podia ser contado.'"
     },
@@ -121,7 +146,7 @@ PIONEER_SCIENTISTS = [
         "nome": "Johannes Kepler (1571 – 1630)",
         "titulo": "Astrônomo e Matemático Alemão",
         "pais": "🇩🇪 Alemanha",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Johannes_Kepler_1610.jpg/800px-Johannes_Kepler_1610.jpg",
+        "foto": get_img("johannes_kepler.jpg"),
         "conquistas": "Descobriu as 3 Leis do Movimento Planetário, provando que as órbitas dos planetas não são círculos perfeitos, mas elipses, e estabeleceu a fórmula harmônica T² = a³.",
         "frase": "'A geometria existia antes da Criação. Ela é eterna como o próprio pensamento divino.'"
     },
@@ -129,7 +154,7 @@ PIONEER_SCIENTISTS = [
         "nome": "Marie Curie (1867 – 1934)",
         "titulo": "Física e Química Pioneira (2 Prêmios Nobel)",
         "pais": "🇵🇱 Polônia / 🇫🇷 França",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Marie_Curie_c._1920s.jpg/800px-Marie_Curie_c._1920s.jpg",
+        "foto": get_img("marie_curie.jpg"),
         "conquistas": "Descobriu os elementos químicos Polônio e Rádio, fundou o estudo da radioatividade (essencial para entender o calor interno de planetas e a energia de estrelas) e foi a primeira pessoa a ganhar dois prêmios Nobel em ciências distintas!",
         "frase": "'Nada na vida deve ser temido, apenas compreendido. Agora é a hora de compreender mais, para temer menos.'"
     },
@@ -137,7 +162,7 @@ PIONEER_SCIENTISTS = [
         "nome": "Albert Einstein (1879 – 1955)",
         "titulo": "Físico Teórico & Criador da Relatividade",
         "pais": "🇩🇪 Alemanha / 🇨🇭 Suíça / 🇺🇸 EUA",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Albert_Einstein_Head.jpg/800px-Albert_Einstein_Head.jpg",
+        "foto": get_img("albert_einstein.jpg"),
         "conquistas": "Formulou a Teoria da Relatividade Especial (E = mc²) e a Teoria da Relatividade Geral, mostrando que a gravidade é a curvatura do espaço-tempo provocada pela massa. Previu buracos negros e ondas gravitacionais.",
         "frase": "'A imaginação é mais importante que o conhecimento, pois o conhecimento é limitado, enquanto a imaginação abraça todo o Universo.'"
     },
@@ -145,7 +170,7 @@ PIONEER_SCIENTISTS = [
         "nome": "Stephen Hawking (1942 – 2018)",
         "titulo": "Físico Teórico e Cosmólogo",
         "pais": "🇬🇧 Reino Unido",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Stephen_Hawking.StarChild.jpg/800px-Stephen_Hawking.StarChild.jpg",
+        "foto": get_img("stephen_hawking.jpg"),
         "conquistas": "Descobriu a Radiação Hawking (mostrando que buracos negros emitem radiação e evaporam lentamente), escreveu o best-seller 'Uma Breve História do Tempo' e desvendou a origem do Universo e singularidades quânticas.",
         "frase": "'Lembre-se de olhar para as estrelas e não para baixo, para os seus pés. Seja curioso.'"
     },
@@ -153,7 +178,7 @@ PIONEER_SCIENTISTS = [
         "nome": "Vera Rubin (1928 – 2016)",
         "titulo": "Astrônoma Pioneira da Matéria Escura",
         "pais": "🇺🇸 Estados Unidos",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Vera_Rubin.jpg/800px-Vera_Rubin.jpg",
+        "foto": get_img("vera_rubin.jpg"),
         "conquistas": "Observou a curva de rotação de dezenas de galáxias espirais e forneceu a primeira evidência observacional conclusiva da existência da Matéria Escura no Universo. O maior observatório astronômico do Chile (Vera C. Rubin Observatory) foi batizado em sua homenagem!",
         "frase": "'A ciência é como caminhar em uma floresta escura com uma pequena lanterna. A cada passo, o mistério aumenta.'"
     },
@@ -161,7 +186,7 @@ PIONEER_SCIENTISTS = [
         "nome": "Cecilia Payne-Gaposchkin (1900 – 1979)",
         "titulo": "Astrofísica britânica-americana",
         "pais": "🇬🇧 Reino Unido / 🇺🇸 EUA",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Cecilia_Helena_Payne_Gaposchkin_%281900-1979%29_in_1950.jpg/800px-Cecilia_Helena_Payne_Gaposchkin_%281900-1979%29_in_1950.jpg",
+        "foto": get_img("cecilia_payne.jpg"),
         "conquistas": "Descobriu em sua tese de doutorado em Harvard (1925) que o Sol e as estrelas são compostos quase inteiramente de Hidrogênio e Hélio, corrigindo todo o entendimento da ciência da época!",
         "frase": "'A recompensa do jovem cientista é a emoção emocional de ser a primeira pessoa na história a ver algo novo.'"
     }
@@ -174,35 +199,35 @@ FAMOUS_MISSIONS = [
     {
         "nome": "Telescópio Espacial James Webb (JWST)",
         "tipo": "Observatório Espacial Infravermelho",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/James_Webb_Space_Telescope_Mirrors_Inspection.jpg/800px-James_Webb_Space_Telescope_Mirrors_Inspection.jpg",
+        "foto": get_img("jwst.png"),
         "orbita": "Ponto de Lagrange L2 (1,5 milhão de km da Terra)",
         "missao": "O maior e mais poderoso telescópio espacial já construído. Com espelho banhado a ouro de 6,5 metros, ele enxerga através da poeira cósmica no infravermelho para registrar as primeiras galáxias formadas após o Big Bang e analisar atmosferas de exoplanetas."
     },
     {
         "nome": "Telescópio Espacial Hubble (HST)",
         "tipo": "Observatório Espacial Óptico e Ultravioleta",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/HST-SM4.jpeg/800px-HST-SM4.jpeg",
+        "foto": get_img("hubble.jpg"),
         "orbita": "Órbita Baixa da Terra (540 km de altitude)",
         "missao": "Lançado em 1990, revolucionou a astronomia ao fornecer imagens ultra nítidas e deslumbrantes livres da turbulência da atmosfera da Terra. Ajudou a determinar a idade precisa do Universo (13,8 bilhões de anos)."
     },
     {
         "nome": "Rover Perseverance & Helicóptero Ingenuity",
         "tipo": "Laboratório Robótico em Marte",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Perseverance_Selfie_at_Rochette_%28cropped%29.jpg/800px-Perseverance_Selfie_at_Rochette_%28cropped%29.jpg",
+        "foto": get_img("perseverance.jpg"),
         "orbita": "Cratera Jezero, Planeta Marte",
         "missao": "Pousou em Marte em 2021 em busca de sinais de antiga vida microbiana fóssil, coletando amostras de rochas em tubos de titânio e testando a produção autônoma de oxigênio (MOXIE) na atmosfera marciana."
     },
     {
         "nome": "Sondas Voyager 1 & Voyager 2",
         "tipo": "Exploração Interestelar Profunda",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Voyager_spacecraft_model.png/800px-Voyager_spacecraft_model.png",
+        "foto": get_img("voyager.png"),
         "orbita": "Espaço Interestelar (a mais de 24 bilhões de km da Terra)",
         "missao": "Lançadas em 1977, exploraram Júpiter, Saturno, Urano e Netuno e agora são os objetos feitos pelo ser humano mais distantes no Cosmos, carregando o Disco de Ouro com sons e fotos da Terra."
     },
     {
         "nome": "Estação Espacial Internacional (ISS)",
         "tipo": "Laboratório Científico Orbital Habitado",
-        "foto": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/International_Space_Station_after_undocking_of_STS-132.jpg/800px-International_Space_Station_after_undocking_of_STS-132.jpg",
+        "foto": get_img("iss.jpg"),
         "orbita": "Órbita Baixa (400 km de altitude, 28.000 km/h)",
         "missao": "Um laboratório habitado continuamente há mais de 20 anos onde astronautas realizam experimentos de microgravidade, biologia, física e medicina. Dá uma volta completa na Terra a cada 90 minutos (16 pores do sol por dia!)."
     }
@@ -211,7 +236,7 @@ FAMOUS_MISSIONS = [
 # ----------------------------------------------------------------------
 # 4. RENDER PRINCIPAL DO MÓDULO
 # ----------------------------------------------------------------------
-def render_knowledge_hub(user: dict):
+def render_knowledge_hub(user: dict, default_subtab: str = None):
     st.markdown("""
         <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(16,28,60,0.95), rgba(12,18,40,0.95)); border: 1px solid #00d4ff;'>
             <h1 style='color: #00d4ff; margin-bottom: 5px;'>📚 Grande Biblioteca Cósmica & Enciclopédia</h1>
@@ -221,18 +246,38 @@ def render_knowledge_hub(user: dict):
         </div>
     """, unsafe_allow_html=True)
     
-    tab_enc, tab_sci, tab_miss, tab_sky, tab_links = st.tabs([
+    sub_options = [
         "🔍 Enciclopédia & Glossário",
         "👩‍🔬 Grandes Cientistas",
         "🛰️ Missões & Telescópios",
         "🔭 Guia de Observação do Céu",
         "🌐 Simuladores & Canais Oficiais"
-    ])
+    ]
     
+    default_idx = 0
+    if default_subtab:
+        for i, opt in enumerate(sub_options):
+            if default_subtab.lower() in opt.lower():
+                default_idx = i
+                break
+    elif "knowledge_subtab_idx" in st.session_state:
+        default_idx = st.session_state.knowledge_subtab_idx
+
+    active_tab = st.radio(
+        "Navegação da Biblioteca:",
+        sub_options,
+        index=default_idx,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="knowledge_subtab_selector"
+    )
+    
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+
     # ----------------------------------------------------
     # TAB 1: ENCICLOPÉDIA DE PESQUISA
     # ----------------------------------------------------
-    with tab_enc:
+    if active_tab == sub_options[0]:
         st.subheader("🔍 Enciclopédia de Termos & Conceitos Astronômicos")
         st.write("Digite uma palavra-chave para pesquisar ou explore as categorias abaixo:")
         
@@ -274,9 +319,9 @@ def render_knowledge_hub(user: dict):
         st.caption("✨ Dica: Você também pode perguntar qualquer dúvida aprofundada para o seu mentor de IA na aba **🤖 CosmoAI**!")
 
     # ----------------------------------------------------
-    # TAB 2: GRANDES CIENTISTAS (GALERIA COM FOTOS LIVRES)
+    # TAB 2: GRANDES CIENTISTAS (GALERIA COM FOTOS LOCAIS)
     # ----------------------------------------------------
-    with tab_sci:
+    elif active_tab == sub_options[1]:
         st.subheader("👩‍🔬 Galeria dos Grandes Pioneiros da Ciência & Astronomia")
         st.write("Conheça as mentes brilhantes que decifraram os mistérios das leis do Universo e abriram o caminho para a exploração espacial:")
         
@@ -284,13 +329,14 @@ def render_knowledge_hub(user: dict):
         
         for idx, sci in enumerate(PIONEER_SCIENTISTS):
             target_col = c_sci1 if idx % 2 == 0 else c_sci2
+            photo_src = get_image_src(sci['foto'])
             
             with target_col:
                 with st.container():
                     st.markdown(f"""
                         <div class='cosmic-card' style='margin-bottom: 20px;'>
                             <div style='display: flex; gap: 16px; align-items: flex-start;'>
-                                <img src='{sci['foto']}' style='width: 110px; height: 130px; object-fit: cover; border-radius: 12px; border: 2px solid #00d4ff; box-shadow: 0 4px 15px rgba(0,212,255,0.25);'>
+                                <img src='{photo_src}' alt='{sci['nome']}' style='width: 110px; height: 130px; object-fit: cover; border-radius: 12px; border: 2px solid #00d4ff; box-shadow: 0 4px 15px rgba(0,212,255,0.25); background: #0f172a;'>
                                 <div>
                                     <h3 style='color: #00d4ff; margin: 0 0 2px 0; font-size: 1.15rem;'>{sci['nome']}</h3>
                                     <span style='color: #94a3b8; font-size: 0.85rem; font-weight: 600;'>{sci['pais']}</span><br>
@@ -307,16 +353,17 @@ def render_knowledge_hub(user: dict):
     # ----------------------------------------------------
     # TAB 3: MISSÕES & TELESCÓPIOS
     # ----------------------------------------------------
-    with tab_miss:
+    elif active_tab == sub_options[2]:
         st.subheader("🛰️ Catálogo de Grandes Missões & Telescópios Espaciais")
         st.write("Veja as maravilhas da engenharia que a humanidade lançou no espaço para tocar os planetas e fotografar a aurora do tempo:")
         
         for miss in FAMOUS_MISSIONS:
+            photo_src = get_image_src(miss['foto'])
             with st.container():
                 st.markdown(f"""
                     <div class='cosmic-card' style='margin-bottom: 22px;'>
                         <div style='display: flex; gap: 20px; align-items: center; flex-wrap: wrap;'>
-                            <img src='{miss['foto']}' style='width: 220px; height: 150px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(0,212,255,0.4); box-shadow: 0 6px 20px rgba(0,0,0,0.5);'>
+                            <img src='{photo_src}' alt='{miss['nome']}' style='width: 220px; height: 150px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(0,212,255,0.4); box-shadow: 0 6px 20px rgba(0,0,0,0.5); background: #0f172a;'>
                             <div style='flex: 1; min-width: 260px;'>
                                 <span class='steam-tag' style='background: rgba(6,214,160,0.2); color: #06d6a0; border: 1px solid #06d6a0;'>🛰️ {miss['tipo']}</span>
                                 <h3 style='color: #00d4ff; margin: 6px 0;'>{miss['nome']}</h3>
@@ -330,7 +377,7 @@ def render_knowledge_hub(user: dict):
     # ----------------------------------------------------
     # TAB 4: GUIA DE OBSERVAÇÃO DO CÉU NOTURNO
     # ----------------------------------------------------
-    with tab_sky:
+    elif active_tab == sub_options[3]:
         st.subheader("🔭 Guia Prático de Observação do Céu para Alunos")
         st.write("Você não precisa de um telescópio gigante para começar a observar o céu! Veja como identificar astros hoje mesmo da sua janela:")
         
@@ -399,7 +446,7 @@ def render_knowledge_hub(user: dict):
     # ----------------------------------------------------
     # TAB 5: SIMULADORES E LINKS OFICIAIS
     # ----------------------------------------------------
-    with tab_links:
+    else:
         st.subheader("🌐 Simuladores Virtuais & Canais Oficiais de Ciência")
         st.write("Recursos digitais livres para explorar o cosmos em 3D e acompanhar notícias da astronomia:")
         
