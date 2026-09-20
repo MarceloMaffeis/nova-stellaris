@@ -10,7 +10,9 @@ import streamlit as st
 import math
 from database import add_xp, unlock_badge
 
-def render_steam_academy(user: dict, default_track: str = None):
+def render_steam_academy(user: dict, default_track: str = None, *args, **kwargs):
+    if not default_track:
+        default_track = st.session_state.get("steam_academy_default")
     st.markdown("""
         <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(16,24,50,0.95), rgba(10,15,35,0.95)); border: 1px solid #00d4ff;'>
             <h1 style='color: #00d4ff; margin-bottom: 5px;'>🎓 Academia Nova Stellaris — Fundamentos & Espaço</h1>

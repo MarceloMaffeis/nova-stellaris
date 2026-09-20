@@ -266,7 +266,9 @@ JWST_HUBBLE_GALLERY = [
     }
 ]
 
-def render_observatory(user: dict, default_tool: str = None):
+def render_observatory(user: dict, default_tool: str = None, *args, **kwargs):
+    if not default_tool:
+        default_tool = st.session_state.get("observatory_tool_default")
     st.markdown("""
         <div class='cosmic-hero'>
             <h1 style='color: #00d4ff; margin-bottom: 5px;'>🌌 Observatório do Cosmos</h1>

@@ -10,7 +10,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 from database import add_xp, unlock_badge
 
-def render_steam_lab(user: dict, default_lab: str = None):
+def render_steam_lab(user: dict, default_lab: str = None, *args, **kwargs):
+    if not default_lab:
+        default_lab = st.session_state.get("steam_lab_default")
     st.markdown("""
         <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(6,30,40,0.95), rgba(16,20,47,0.95)); border: 1px solid #00f5d4;'>
             <h1 style='color: #00f5d4; margin-bottom: 5px;'>🧮 Laboratório STEAM do Espaço</h1>

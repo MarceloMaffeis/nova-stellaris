@@ -18,7 +18,9 @@ def get_img(filename: str) -> str:
         return local_p
     return filename
 
-def render_sci_fi_missions(user: dict, default_mission: str = None):
+def render_sci_fi_missions(user: dict, default_mission: str = None, *args, **kwargs):
+    if not default_mission:
+        default_mission = st.session_state.get("scifi_mission_default")
     st.markdown("""
         <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(30,16,60,0.95), rgba(16,20,47,0.95)); border: 1px solid #f72585;'>
             <h1 style='color: #ffd166; margin-bottom: 5px;'>🚀 Simulador de Missões Sci-Fi</h1>

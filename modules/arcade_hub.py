@@ -8,7 +8,9 @@ from modules.astro_valley_web import render_astro_valley
 from modules.hail_mary_game import render_hail_mary_game
 from modules.interstellar_game import render_interstellar_game
 
-def render_arcade_hub(user: dict, default_game: str = None):
+def render_arcade_hub(user: dict, default_game: str = None, *args, **kwargs):
+    if not default_game:
+        default_game = st.session_state.get("arcade_game_default")
     st.markdown("""
         <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(30,16,60,0.95), rgba(16,20,47,0.95)); border: 1px solid #ffd166;'>
             <h1 style='color: #ffd166; margin-bottom: 5px;'>🎮 Arcade Cósmico STEAM — Trilogia Sci-Fi</h1>

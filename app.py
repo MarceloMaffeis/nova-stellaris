@@ -45,18 +45,46 @@ def load_css():
 
 load_css()
 
-# Importar Módulos da Aplicação
+# Importar Módulos da Aplicação com Recarregamento Dinâmico (Evita cache antigo no Streamlit Cloud)
+import importlib
 from assets.badges import BADGES, get_rank_for_xp
 from modules.auth import render_auth_page
 from modules.admin_dashboard import render_admin_dashboard
-from modules.steam_academy import render_steam_academy
+
+import modules.observatory
+importlib.reload(modules.observatory)
 from modules.observatory import render_observatory
-from modules.sci_fi_missions import render_sci_fi_missions
+
+import modules.knowledge_hub
+importlib.reload(modules.knowledge_hub)
+from modules.knowledge_hub import render_knowledge_hub
+
+import modules.steam_lab
+importlib.reload(modules.steam_lab)
 from modules.steam_lab import render_steam_lab
+
+import modules.steam_academy
+importlib.reload(modules.steam_academy)
+from modules.steam_academy import render_steam_academy
+
+import modules.sci_fi_missions
+importlib.reload(modules.sci_fi_missions)
+from modules.sci_fi_missions import render_sci_fi_missions
+
+import modules.arcade_hub
+importlib.reload(modules.arcade_hub)
 from modules.arcade_hub import render_arcade_hub
+
 from modules.cosmo_ai import render_cosmo_ai
 from modules.quiz_game import render_quiz_game
-from modules.knowledge_hub import render_knowledge_hub
+
+def safe_call(render_fn, user_data, **kwargs):
+    """Executa a função de renderização de forma segura contra divergências de versão em cache."""
+    try:
+        render_fn(user_data, **kwargs)
+    except TypeError:
+        render_fn(user_data)
+
 
 # ----------------------------------------------------------------------
 # CONTROLE DE SESSÃO & AUTENTICAÇÃO
@@ -685,53 +713,70 @@ else:
             
         st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
 
-        # Roteamento dos Módulos Específicos
+        # Roteamento dos Módulos Específicos com Blindagem contra Erros de Cache
         if current_page == "obs_atlas":
-            render_observatory(user, default_tool="Atlas")
+            st.session_state.observatory_tool_default = "Atlas"
+            safe_call(render_observatory, user, default_tool="Atlas")
         elif current_page == "obs_balance":
-            render_observatory(user, default_tool="Balança")
+            st.session_state.observatory_tool_default = "Balança"
+            safe_call(render_observatory, user, default_tool="Balança")
         elif current_page == "obs_calc":
-            render_observatory(user, default_tool="Calculadora")
+            st.session_state.observatory_tool_default = "Calculadora"
+            safe_call(render_observatory, user, default_tool="Calculadora")
         elif current_page == "obs_gallery":
-            render_observatory(user, default_tool="Galeria")
+            st.session_state.observatory_tool_default = "Galeria"
+            safe_call(render_observatory, user, default_tool="Galeria")
         elif current_page == "obs_apod":
-            render_observatory(user, default_tool="APOD")
+            st.session_state.observatory_tool_default = "APOD"
+            safe_call(render_observatory, user, default_tool="APOD")
         elif current_page == "steam_chem":
-            render_steam_lab(user, default_lab="Química")
+            st.session_state.steam_lab_default = "Química"
+            safe_call(render_steam_lab, user, default_lab="Química")
         elif current_page == "steam_rover":
-            render_steam_lab(user, default_lab="Computação")
+            st.session_state.steam_lab_default = "Computação"
+            safe_call(render_steam_lab, user, default_lab="Computação")
         elif current_page == "steam_math":
-            render_steam_lab(user, default_lab="Matemática")
+            st.session_state.steam_lab_default = "Matemática"
+            safe_call(render_steam_lab, user, default_lab="Matemática")
         elif current_page == "steam_physics":
-            render_steam_lab(user, default_lab="Física")
+            st.session_state.steam_lab_default = "Física"
+            safe_call(render_steam_lab, user, default_lab="Física")
         elif current_page == "steam_academy":
-            render_steam_academy(user)
+            safe_call(render_steam_academy, user)
         elif current_page == "scifi_martian":
-            render_sci_fi_missions(user, default_mission="Perdido em Marte")
+            st.session_state.scifi_mission_default = "Perdido em Marte"
+            safe_call(render_sci_fi_missions, user, default_mission="Perdido em Marte")
         elif current_page == "scifi_hailmary":
-            render_sci_fi_missions(user, default_mission="Devoradores de Estrelas")
+            st.session_state.scifi_mission_default = "Devoradores de Estrelas"
+            safe_call(render_sci_fi_missions, user, default_mission="Devoradores de Estrelas")
         elif current_page == "scifi_interstellar":
-            render_sci_fi_missions(user, default_mission="Interestelar")
+            st.session_state.scifi_mission_default = "Interestelar"
+            safe_call(render_sci_fi_missions, user, default_mission="Interestelar")
         elif current_page == "arcade_hub":
-            render_arcade_hub(user)
+            safe_call(render_arcade_hub, user)
         elif current_page == "lib_encyclopedia":
-            render_knowledge_hub(user, default_subtab="Enciclopédia")
+            st.session_state.knowledge_subtab_default = "Enciclopédia"
+            safe_call(render_knowledge_hub, user, default_subtab="Enciclopédia")
         elif current_page == "lib_scientists":
-            render_knowledge_hub(user, default_subtab="Cientistas")
+            st.session_state.knowledge_subtab_default = "Cientistas"
+            safe_call(render_knowledge_hub, user, default_subtab="Cientistas")
         elif current_page == "lib_missions":
-            render_knowledge_hub(user, default_subtab="Missões")
+            st.session_state.knowledge_subtab_default = "Missões"
+            safe_call(render_knowledge_hub, user, default_subtab="Missões")
         elif current_page == "lib_sky":
-            render_knowledge_hub(user, default_subtab="Guia")
+            st.session_state.knowledge_subtab_default = "Guia"
+            safe_call(render_knowledge_hub, user, default_subtab="Guia")
         elif current_page == "lib_links":
-            render_knowledge_hub(user, default_subtab="Simuladores")
+            st.session_state.knowledge_subtab_default = "Simuladores"
+            safe_call(render_knowledge_hub, user, default_subtab="Simuladores")
         elif current_page == "cosmo_ai":
-            render_cosmo_ai(user)
+            safe_call(render_cosmo_ai, user)
         elif current_page == "quiz_game":
-            render_quiz_game(user)
+            safe_call(render_quiz_game, user)
         elif current_page == "badges_gallery":
             render_badges_page()
         elif current_page == "admin_dashboard":
-            render_admin_dashboard(user)
+            safe_call(render_admin_dashboard, user)
 
         # Botão de retorno no rodapé para comodidade do aluno
         st.markdown("---")

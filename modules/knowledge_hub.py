@@ -236,7 +236,9 @@ FAMOUS_MISSIONS = [
 # ----------------------------------------------------------------------
 # 4. RENDER PRINCIPAL DO MÓDULO
 # ----------------------------------------------------------------------
-def render_knowledge_hub(user: dict, default_subtab: str = None):
+def render_knowledge_hub(user: dict, default_subtab: str = None, *args, **kwargs):
+    if not default_subtab:
+        default_subtab = st.session_state.get("knowledge_subtab_default")
     st.markdown("""
         <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(16,28,60,0.95), rgba(12,18,40,0.95)); border: 1px solid #00d4ff;'>
             <h1 style='color: #00d4ff; margin-bottom: 5px;'>📚 Grande Biblioteca Cósmica & Enciclopédia</h1>
