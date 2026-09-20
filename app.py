@@ -299,8 +299,8 @@ else:
                             </div>
                         </div>
                         <div style='text-align: right;'>
-                            <span style='color: #ffd166; font-size: 1.15rem; font-weight: 800;'>{user['xp']} XP</span><br>
-                            <span style='color: {current_rank["badge_color"]}; font-size: 0.8rem; font-weight: 600;'>{current_rank["icon"]} {current_rank["title"]}</span>
+                            <span style='color: #ffd166; font-size: 1.15rem; font-weight: 800;'>{user.get('xp', 0)} XP</span><br>
+                            <span style='color: {current_rank.get("badge_color", "#38bdf8")}; font-size: 0.8rem; font-weight: 600;'>{current_rank.get("icon", "🎖️")} {current_rank.get("title", "Cadete")}</span>
                         </div>
                     </div>
                     <div class='xp-bar-bg' style='margin: 8px 0 6px 0;'>
@@ -308,7 +308,7 @@ else:
                     </div>
                     <div style='display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem; color: #cbd5e1;'>
                         <span>🏅 <strong>{len(unlocked_badges)} de {len(BADGES)}</strong> medalhas</span>
-                        <span style='color: #38bdf8;'>Nível {current_rank["rank"]}</span>
+                        <span style='color: #38bdf8;'>Nível {current_rank.get("level", 1)}</span>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
