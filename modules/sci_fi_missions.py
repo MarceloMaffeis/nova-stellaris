@@ -20,47 +20,18 @@ def get_img(filename: str) -> str:
 
 def render_sci_fi_missions(user: dict, default_mission: str = None, *args, **kwargs):
     if not default_mission:
-        default_mission = st.session_state.get("scifi_mission_default")
-    st.markdown("""
-        <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(30,16,60,0.95), rgba(16,20,47,0.95)); border: 1px solid #f72585;'>
-            <h1 style='color: #ffd166; margin-bottom: 5px;'>🚀 Simulador de Missões Sci-Fi</h1>
-            <p style='color: #cbd5e1; font-size: 1.1rem; margin: 0;'>
-                Assuma o controle de missões lendárias do cinema e da literatura, usando Física, Matemática, Química e Computação para vencer!
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
+        default_mission = st.session_state.get("scifi_mission_default", "Perdido em Marte")
     
-    missions_list = [
-        "🔴 Missão 1: Perdido em Marte (The Martian)",
-        "✨ Missão 2: Devoradores de Estrelas (Project Hail Mary)",
-        "⏳ Missão 3: Gargantua & Planeta Miller (Interestelar)"
-    ]
+    m = str(default_mission).lower()
     
-    default_idx = 0
-    if default_mission:
-        for i, m in enumerate(missions_list):
-            if default_mission.lower() in m.lower():
-                default_idx = i
-                break
-    elif "scifi_mission_idx" in st.session_state:
-        default_idx = st.session_state.scifi_mission_idx
-        
-    mission_choice = st.radio(
-        "Selecione sua Operação Espacial:",
-        missions_list,
-        index=default_idx,
-        horizontal=True,
-        label_visibility="collapsed",
-        key="scifi_mission_selector"
-    )
-    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
-    
-    if "Perdido em Marte" in mission_choice:
+    if "marte" in m or "martian" in m:
         render_the_martian_mission(user)
-    elif "Devoradores de Estrelas" in mission_choice:
+    elif "hail" in m or "devorador" in m:
         render_hail_mary_mission(user)
-    else:
+    elif "interestelar" in m or "interstellar" in m or "gargantua" in m:
         render_interstellar_mission(user)
+    else:
+        render_the_martian_mission(user)
 
 # ----------------------------------------------------------------------
 # MISSÃO 1: PERDIDO EM MARTE

@@ -268,48 +268,14 @@ JWST_HUBBLE_GALLERY = [
 
 def render_observatory(user: dict, default_tool: str = None, *args, **kwargs):
     if not default_tool:
-        default_tool = st.session_state.get("observatory_tool_default")
-    st.markdown("""
-        <div class='cosmic-hero'>
-            <h1 style='color: #00d4ff; margin-bottom: 5px;'>🌌 Observatório do Cosmos</h1>
-            <p style='color: #cbd5e1; font-size: 1.1rem; margin: 0;'>
-                Explore os mundos do Sistema Solar, compare gravidades, calcule viagens cósmicas e veja imagens em alta definição do James Webb!
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
+        default_tool = st.session_state.get("observatory_tool_default", "Atlas")
     
-    obs_options = [
-        "🪐 Atlas Planetário",
-        "⚖️ Balança Interplanetária",
-        "🚀 Calculadora de Viagem",
-        "📸 Galeria James Webb & Hubble",
-        "🌠 Imagem Astronômica do Dia (NASA)"
-    ]
-    
-    default_idx = 0
-    if default_tool:
-        for i, opt in enumerate(obs_options):
-            if default_tool.lower() in opt.lower():
-                default_idx = i
-                break
-    elif "observatory_tool_idx" in st.session_state:
-        default_idx = st.session_state.observatory_tool_idx
-        
-    active_obs = st.radio(
-        "Instrumento do Observatório:",
-        obs_options,
-        index=default_idx,
-        horizontal=True,
-        label_visibility="collapsed",
-        key="observatory_tool_selector"
-    )
-    
-    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    t = str(default_tool).lower()
     
     # ------------------------------------------------------------------
-    # TAB 1: ATLAS PLANETÁRIO
+    # FERRAMENTA 1: ATLAS PLANETÁRIO
     # ------------------------------------------------------------------
-    if active_obs == obs_options[0]:
+    if "atlas" in t:
         st.subheader("🪐 Atlas do Sistema Solar e Mundos Fascinantes")
         st.write("Clique em um astro para inspecionar seus dados físicos, imagens reais e conexões científicas:")
         
@@ -370,9 +336,9 @@ def render_observatory(user: dict, default_tool: str = None, *args, **kwargs):
         st.plotly_chart(fig_size, use_container_width=True)
 
     # ----------------------------------------------------
-    # TAB 2: BALANÇA INTERPLANETÁRIA
+    # FERRAMENTA 2: BALANÇA INTERPLANETÁRIA
     # ----------------------------------------------------
-    elif active_obs == obs_options[1]:
+    elif "balan" in t or "balance" in t:
         st.subheader("⚖️ Balança Gravitacional Interplanetária")
         st.write("A sua massa em quilogramas (kg) é constante em qualquer lugar do cosmos, mas o seu **PESO (Força Gravitacional)** muda drasticamente!")
         
@@ -399,9 +365,9 @@ def render_observatory(user: dict, default_tool: str = None, *args, **kwargs):
             st.success("Experimento registrado com sucesso no seu Diário de Bordo! (+15 XP)")
 
     # ----------------------------------------------------
-    # TAB 3: CALCULADORA DE VIAGEM ESPACIAL
+    # FERRAMENTA 3: CALCULADORA DE VIAGEM ESPACIAL
     # ----------------------------------------------------
-    elif active_obs == obs_options[2]:
+    elif "calc" in t:
         st.subheader("🚀 Calculadora de Tempo de Viagem Interplanetária")
         st.write("Descubra quanto tempo levaria para alcançar as fronteiras do espaço com diferentes veículos da humanidade:")
         
@@ -433,9 +399,9 @@ def render_observatory(user: dict, default_tool: str = None, *args, **kwargs):
         """, unsafe_allow_html=True)
 
     # ----------------------------------------------------
-    # TAB 4: GALERIA JAMES WEBB & HUBBLE (ALTA RESOLUÇÃO)
+    # FERRAMENTA 4: GALERIA JAMES WEBB & HUBBLE (ALTA RESOLUÇÃO)
     # ----------------------------------------------------
-    elif active_obs == obs_options[3]:
+    elif "galeria" in t or "gallery" in t:
         st.subheader("📸 Galeria Cósmica em Alta Resolução (NASA, JWST & Hubble)")
         st.write("Imagens reais captadas pelos maiores observatórios e sondas da história da humanidade:")
         

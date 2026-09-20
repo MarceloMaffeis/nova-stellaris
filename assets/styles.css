@@ -16,6 +16,12 @@
     --text-muted: #94a3b8;
 }
 
+/* Reduzir o espaçamento excessivo no topo para que a página abra logo no topo */
+.block-container {
+    padding-top: 1.5rem !important;
+    padding-bottom: 2.5rem !important;
+}
+
 /* Background com estrelas */
 .stApp {
     background-color: var(--space-bg);

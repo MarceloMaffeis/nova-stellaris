@@ -16,6 +16,7 @@ if MODULES_DIR not in sys.path:
     sys.path.insert(0, MODULES_DIR)
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 # Configuração da página
 st.set_page_config(
@@ -24,6 +25,113 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Injetar meta tags Open Graph diretamente no index.html do Streamlit para crawlers de redes sociais (WhatsApp, etc.)
+def patch_index_html():
+    try:
+        streamlit_path = os.path.dirname(st.__file__)
+        index_path = os.path.join(streamlit_path, "static", "index.html")
+        if os.path.exists(index_path):
+            with open(index_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            
+            og_meta_tags = """
+    <!-- Open Graph / Rich Social Preview (WhatsApp, Classroom, Discord, Redes Sociais) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Nova Stellaris" />
+    <meta property="og:title" content="🚀 Nova Stellaris — Centro de Comando Espacial STEAM" />
+    <meta property="og:description" content="Plataforma interativa de astronomia, física, matemática e ciências espaciais para jovens e estudantes. Explore planetas, simule missões cósmicas e aprenda com CosmoAI!" />
+    <meta property="og:image" content="https://raw.githubusercontent.com/MarceloMaffeis/nova-stellaris/main/assets/images/earth.jpg" />
+    <meta property="og:image:secure_url" content="https://raw.githubusercontent.com/MarceloMaffeis/nova-stellaris/main/assets/images/earth.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="https://nova-stellaris.streamlit.app" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="🚀 Nova Stellaris — Centro de Comando Espacial STEAM" />
+    <meta name="twitter:description" content="Plataforma interativa de astronomia, física, matemática e ciências espaciais para jovens e estudantes." />
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/MarceloMaffeis/nova-stellaris/main/assets/images/earth.jpg" />
+            """
+            if "og:title" not in content and "<head>" in content:
+                content = content.replace("<head>", f"<head>{og_meta_tags}")
+                with open(index_path, "w", encoding="utf-8") as f:
+                    f.write(content)
+    except Exception:
+        pass
+
+patch_index_html()
+
+def inject_seo_tags():
+    """Injeta meta tags Open Graph no cabeçalho da janela principal para navegadores e compartilhamento."""
+    components.html(
+        """
+        <script>
+            try {
+                const head = window.parent.document.head;
+                const metaTags = [
+                    { property: 'og:title', content: '🚀 Nova Stellaris — Centro de Comando Espacial STEAM' },
+                    { property: 'og:description', content: 'Plataforma interativa de astronomia, física, matemática e ciências espaciais para jovens e estudantes. Explore planetas, simule missões cósmicas e aprenda com CosmoAI!' },
+                    { property: 'og:image', content: 'https://raw.githubusercontent.com/MarceloMaffeis/nova-stellaris/main/assets/images/earth.jpg' },
+                    { property: 'og:type', content: 'website' },
+                    { property: 'og:url', content: 'https://nova-stellaris.streamlit.app' },
+                    { name: 'twitter:card', content: 'summary_large_image' },
+                    { name: 'twitter:title', content: '🚀 Nova Stellaris — Centro de Comando Espacial STEAM' },
+                    { name: 'twitter:description', content: 'Plataforma interativa de astronomia e ciências espaciais.' },
+                    { name: 'twitter:image', content: 'https://raw.githubusercontent.com/MarceloMaffeis/nova-stellaris/main/assets/images/earth.jpg' }
+                ];
+                metaTags.forEach(m => {
+                    let selector = m.property ? `meta[property='${m.property}']` : `meta[name='${m.name}']`;
+                    let el = head.querySelector(selector);
+                    if (!el) {
+                        el = window.parent.document.createElement('meta');
+                        if (m.property) el.setAttribute('property', m.property);
+                        if (m.name) el.setAttribute('name', m.name);
+                        head.appendChild(el);
+                    }
+                    el.setAttribute('content', m.content);
+                });
+            } catch(e) {}
+        </script>
+        """,
+        height=0,
+        width=0,
+    )
+
+def scroll_to_top():
+    """Garante que a visualização role instantaneamente para o topo ao carregar ou trocar de tela."""
+    components.html(
+        """
+        <script>
+            function forceScrollTop() {
+                try {
+                    const doc = window.parent.document;
+                    const targets = [
+                        doc.querySelector('section.main'),
+                        doc.querySelector('[data-testid="stMain"]'),
+                        doc.querySelector('[data-testid="stAppViewContainer"]'),
+                        doc.querySelector('.main'),
+                        window.parent,
+                        window
+                    ];
+                    targets.forEach(t => {
+                        if (t && typeof t.scrollTo === 'function') {
+                            t.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                        }
+                        if (t && t.scrollTop !== undefined) {
+                            t.scrollTop = 0;
+                        }
+                    });
+                } catch(e) {}
+            }
+            forceScrollTop();
+            setTimeout(forceScrollTop, 30);
+            setTimeout(forceScrollTop, 120);
+            setTimeout(forceScrollTop, 300);
+        </script>
+        """,
+        height=0,
+        width=0,
+    )
 
 # Inicializar Banco de Dados
 from database import (
@@ -44,6 +152,7 @@ def load_css():
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 load_css()
+inject_seo_tags()
 
 # Importar Módulos da Aplicação com Recarregamento Dinâmico (Evita cache antigo no Streamlit Cloud)
 import importlib
@@ -690,6 +799,7 @@ else:
     }
 
     current_page = st.session_state.current_page
+    scroll_to_top()
 
     # RENDERIZAÇÃO DA PÁGINA ESCOLHIDA
     if current_page == "home":

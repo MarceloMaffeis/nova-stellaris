@@ -1,5 +1,9 @@
 # 🚀 Nova Stellaris — Universo Interativo STEAM
 
+<p align="center">
+  <img src="assets/images/earth.jpg" alt="Nova Stellaris" width="100%" style="max-height: 380px; object-fit: cover; border-radius: 12px;" />
+</p>
+
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.35%2B-FF4B4B.svg?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![SQLite](https://img.shields.io/badge/Database-SQLite-003B57.svg?logo=sqlite&logoColor=white)](https://sqlite.org)

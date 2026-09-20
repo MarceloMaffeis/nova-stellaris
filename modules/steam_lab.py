@@ -12,46 +12,14 @@ from database import add_xp, unlock_badge
 
 def render_steam_lab(user: dict, default_lab: str = None, *args, **kwargs):
     if not default_lab:
-        default_lab = st.session_state.get("steam_lab_default")
-    st.markdown("""
-        <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(6,30,40,0.95), rgba(16,20,47,0.95)); border: 1px solid #00f5d4;'>
-            <h1 style='color: #00f5d4; margin-bottom: 5px;'>🧮 Laboratório STEAM do Espaço</h1>
-            <p style='color: #cbd5e1; font-size: 1.1rem; margin: 0;'>
-                Experimente na prática as 4 grandes forças do conhecimento: <strong>Física, Matemática, Química e Computação</strong>.
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
+        default_lab = st.session_state.get("steam_lab_default", "Química")
     
-    lab_options = [
-        "🧪 Química: Forja Estelar & Foguetes",
-        "💻 Computação: Terminal do Rover",
-        "🧮 Matemática: Potências de 10 & Volume",
-        "🌌 Física: Leis de Kepler & Órbitas"
-    ]
-    
-    default_idx = 0
-    if default_lab:
-        for i, opt in enumerate(lab_options):
-            if default_lab.lower() in opt.lower():
-                default_idx = i
-                break
-    elif "steam_lab_idx" in st.session_state:
-        default_idx = st.session_state.steam_lab_idx
-
-    active_lab = st.radio(
-        "Bancada do Laboratório:",
-        lab_options,
-        index=default_idx,
-        horizontal=True,
-        label_visibility="collapsed",
-        key="steam_lab_selector"
-    )
-    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    l = str(default_lab).lower()
     
     # ----------------------------------------------------
     # 1. QUÍMICA ESPACIAL
     # ----------------------------------------------------
-    if active_lab == lab_options[0]:
+    if "quím" in l or "chem" in l:
         st.subheader("🧪 A Tabela Periódica Forjada nas Estrelas")
         st.markdown("""
             Você sabia que **todos os elementos do seu corpo foram fabricados dentro de estrelas**?
@@ -103,14 +71,14 @@ def render_steam_lab(user: dict, default_lab: str = None, *args, **kwargs):
     # ----------------------------------------------------
     # 2. COMPUTAÇÃO: TERMINAL DO ROVER VISUAL
     # ----------------------------------------------------
-    elif active_lab == lab_options[1]:
+    elif "comp" in l or "rover" in l:
         from modules.rover_simulator import render_rover_simulator
         render_rover_simulator(user)
 
     # ----------------------------------------------------
     # 3. MATEMÁTICA: POTÊNCIAS DE 10 & NOTAÇÃO CIENTÍFICA
     # ----------------------------------------------------
-    elif active_lab == lab_options[2]:
+    elif "mat" in l or "math" in l:
         st.subheader("🧮 O Mago da Notação Científica & Potências de 10")
         st.markdown("""
             No espaço, os números são gigantescos (milhões de anos-luz) ou minúsculos (átomos).

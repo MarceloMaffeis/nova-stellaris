@@ -238,48 +238,14 @@ FAMOUS_MISSIONS = [
 # ----------------------------------------------------------------------
 def render_knowledge_hub(user: dict, default_subtab: str = None, *args, **kwargs):
     if not default_subtab:
-        default_subtab = st.session_state.get("knowledge_subtab_default")
-    st.markdown("""
-        <div class='cosmic-hero' style='background: linear-gradient(135deg, rgba(16,28,60,0.95), rgba(12,18,40,0.95)); border: 1px solid #00d4ff;'>
-            <h1 style='color: #00d4ff; margin-bottom: 5px;'>📚 Grande Biblioteca Cósmica & Enciclopédia</h1>
-            <p style='color: #cbd5e1; font-size: 1.1rem; margin: 0;'>
-                Seu centro completo de pesquisa astronômica: consulte termos científicos, conheça os grandes cientistas, explore missões espaciais e aprenda a observar o céu!
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
+        default_subtab = st.session_state.get("knowledge_subtab_default", "Enciclopédia")
     
-    sub_options = [
-        "🔍 Enciclopédia & Glossário",
-        "👩‍🔬 Grandes Cientistas",
-        "🛰️ Missões & Telescópios",
-        "🔭 Guia de Observação do Céu",
-        "🌐 Simuladores & Canais Oficiais"
-    ]
-    
-    default_idx = 0
-    if default_subtab:
-        for i, opt in enumerate(sub_options):
-            if default_subtab.lower() in opt.lower():
-                default_idx = i
-                break
-    elif "knowledge_subtab_idx" in st.session_state:
-        default_idx = st.session_state.knowledge_subtab_idx
-
-    active_tab = st.radio(
-        "Navegação da Biblioteca:",
-        sub_options,
-        index=default_idx,
-        horizontal=True,
-        label_visibility="collapsed",
-        key="knowledge_subtab_selector"
-    )
-    
-    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    s = str(default_subtab).lower()
 
     # ----------------------------------------------------
-    # TAB 1: ENCICLOPÉDIA DE PESQUISA
+    # 1. ENCICLOPÉDIA DE PESQUISA
     # ----------------------------------------------------
-    if active_tab == sub_options[0]:
+    if "enciclop" in s or "gloss" in s:
         st.subheader("🔍 Enciclopédia de Termos & Conceitos Astronômicos")
         st.write("Digite uma palavra-chave para pesquisar ou explore as categorias abaixo:")
         
@@ -321,9 +287,9 @@ def render_knowledge_hub(user: dict, default_subtab: str = None, *args, **kwargs
         st.caption("✨ Dica: Você também pode perguntar qualquer dúvida aprofundada para o seu mentor de IA na aba **🤖 CosmoAI**!")
 
     # ----------------------------------------------------
-    # TAB 2: GRANDES CIENTISTAS (GALERIA COM FOTOS LOCAIS)
+    # 2. GRANDES CIENTISTAS (GALERIA COM FOTOS LOCAIS)
     # ----------------------------------------------------
-    elif active_tab == sub_options[1]:
+    elif "cientista" in s:
         st.subheader("👩‍🔬 Galeria dos Grandes Pioneiros da Ciência & Astronomia")
         st.write("Conheça as mentes brilhantes que decifraram os mistérios das leis do Universo e abriram o caminho para a exploração espacial:")
         
@@ -353,9 +319,9 @@ def render_knowledge_hub(user: dict, default_subtab: str = None, *args, **kwargs
                     """, unsafe_allow_html=True)
 
     # ----------------------------------------------------
-    # TAB 3: MISSÕES & TELESCÓPIOS
+    # 3. MISSÕES & TELESCÓPIOS
     # ----------------------------------------------------
-    elif active_tab == sub_options[2]:
+    elif "miss" in s or "telesc" in s:
         st.subheader("🛰️ Catálogo de Grandes Missões & Telescópios Espaciais")
         st.write("Veja as maravilhas da engenharia que a humanidade lançou no espaço para tocar os planetas e fotografar a aurora do tempo:")
         
@@ -377,9 +343,9 @@ def render_knowledge_hub(user: dict, default_subtab: str = None, *args, **kwargs
                 """, unsafe_allow_html=True)
 
     # ----------------------------------------------------
-    # TAB 4: GUIA DE OBSERVAÇÃO DO CÉU NOTURNO
+    # 4. GUIA DE OBSERVAÇÃO DO CÉU NOTURNO
     # ----------------------------------------------------
-    elif active_tab == sub_options[3]:
+    elif "guia" in s or "céu" in s or "ceu" in s:
         st.subheader("🔭 Guia Prático de Observação do Céu para Alunos")
         st.write("Você não precisa de um telescópio gigante para começar a observar o céu! Veja como identificar astros hoje mesmo da sua janela:")
         
